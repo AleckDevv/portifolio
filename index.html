@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1e3dff" />
+    <meta name="color-scheme" content="light" />
+    <meta name="author" content="Alex Soares Lopes" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!--app-head--><title>AleckDevv — Alex Soares Lopes</title><!--/app-head-->
+    <script>
+      // Aplica as preferências salvas antes da primeira pintura (sem "piscar").
+      (function () {
+        try {
+          var root = document.documentElement;
+          if (localStorage.getItem("aleckdevv:tech") === "on") root.dataset.tech = "on";
+          var motion = localStorage.getItem("aleckdevv:motion");
+          if (motion === "reduce" || motion === "full") root.dataset.motion = motion;
+        } catch (error) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <p style="font-family: system-ui, sans-serif; padding: 1rem; margin: 0; background: #e3ff3b; color: #0b1026">
+        Todo o conteúdo está disponível, mas abas, diálogos e efeitos interativos precisam de JavaScript.
+      </p>
+    </noscript>
+    <div id="root"><!--app-html--></div>
+    <script type="module" src="/src/entry-client.tsx"></script>
+  </body>
+</html>

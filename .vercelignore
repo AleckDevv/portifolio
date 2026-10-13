@@ -1,0 +1,8 @@
+# Arquivos que não precisam ser enviados à Vercel (o build é refeito lá).
+node_modules
+dist
+dist-ssr
+assets-src
+test-results
+playwright-report
+review-screens

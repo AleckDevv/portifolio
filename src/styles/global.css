@@ -1,0 +1,497 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Variantes
+   tech:   ativa quando o "modo técnico" está ligado (data-tech="on" no <html>)
+   reduce: movimento reduzido (preferência do sistema OU escolha no site)
+--------------------------------------------------------------------------- */
+@custom-variant tech (&:where([data-tech="on"], [data-tech="on"] *));
+@custom-variant reduce {
+  @media (prefers-reduced-motion: reduce) {
+    &:where(:not([data-motion="full"], [data-motion="full"] *)) {
+      @slot;
+    }
+  }
+  &:where([data-motion="reduce"], [data-motion="reduce"] *) {
+    @slot;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Tokens — paleta enxuta: papel, tinta, azul elétrico, ciano, laranja e
+   amarelo ácido. As cores padrão do Tailwind são desativadas de propósito.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-white: #ffffff;
+  --color-paper: #f3f2ed;
+  --color-paper-deep: #e7e5dc;
+  --color-ink: #0b1026;
+  --color-ink-soft: #4a4f63;
+  --color-ink-line: #c9c7bd;
+  --color-volt: #1e3dff;
+  --color-volt-deep: #1028c9;
+  --color-cyan: #00d1ff;
+  --color-orange: #ff5b14;
+  --color-acid: #e3ff3b;
+
+  --font-sans: "Mona Sans Variable", "Mona Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
+  --font-mono: "Martian Mono Variable", "Martian Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --text-mega: clamp(3.1rem, 14.2vw, 12.5rem);
+  --text-mega--line-height: 0.84;
+  --text-giga: clamp(2.6rem, 13.4vw, 15rem);
+  --text-giga--line-height: 0.86;
+  --text-display: clamp(2.5rem, 6.4vw, 6.5rem);
+  --text-display--line-height: 0.9;
+  --text-title: clamp(1.6rem, 3.4vw, 3.25rem);
+  --text-title--line-height: 1;
+  --text-lead: clamp(1.15rem, 1.6vw, 1.45rem);
+  --text-lead--line-height: 1.45;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@utility wide {
+  font-stretch: 125%;
+}
+@utility semiwide {
+  font-stretch: 112.5%;
+}
+@utility narrow {
+  font-stretch: 75%;
+}
+@utility text-outline {
+  /* Contorno: o traço usa a cor do texto e o preenchimento usa a cor do fundo
+     (--outline-fill). Com paint-order, o preenchimento cobre a metade interna do
+     traço e esconde os contornos sobrepostos da fonte variável. */
+  -webkit-text-fill-color: var(--outline-fill, transparent);
+  -webkit-text-stroke: calc(var(--outline-width, 0.03em) * 2) currentColor;
+  paint-order: stroke fill;
+}
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-stretch: 87.5%;
+}
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html:not([data-motion="full"]) {
+      scroll-behavior: auto;
+    }
+  }
+  html[data-motion="reduce"] {
+    scroll-behavior: auto;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--color-paper);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-acid);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus, var(--color-volt));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+
+  img,
+  svg,
+  canvas,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  dialog {
+    color: inherit;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Temas de seção (cada seção define fundo, texto e cor do foco)
+--------------------------------------------------------------------------- */
+@layer components {
+  .theme-paper {
+    --focus: var(--color-volt);
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  .theme-volt {
+    --focus: var(--color-acid);
+    background: var(--color-volt);
+    color: var(--color-white);
+  }
+  .theme-ink {
+    --focus: var(--color-acid);
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .theme-acid {
+    --focus: var(--color-ink);
+    background: var(--color-acid);
+    color: var(--color-ink);
+  }
+  .theme-orange {
+    --focus: var(--color-ink);
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+
+  /* Superfície com a identidade de cada projeto (cores vindas de projects.ts) */
+  .theme-project {
+    --focus: var(--accent-focus, var(--color-volt));
+    background: var(--accent-surface);
+    color: var(--accent-on);
+  }
+
+  .muted {
+    color: color-mix(in oklab, currentColor 74%, transparent);
+  }
+
+  /* Botões */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    min-height: 3rem;
+    padding: 0.75rem 1.35rem;
+    font-weight: 650;
+    font-stretch: 112.5%;
+    line-height: 1.1;
+    text-decoration: none;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+    transition:
+      background-color 0.25s var(--ease-out-expo),
+      color 0.25s var(--ease-out-expo),
+      transform 0.25s var(--ease-out-expo);
+  }
+  .btn:active {
+    transform: translateY(1px) scale(0.99);
+  }
+  .btn-acid {
+    background: var(--color-acid);
+    color: var(--color-ink);
+    border-color: var(--color-acid);
+  }
+  .btn-acid:hover {
+    background: var(--color-white);
+    border-color: var(--color-white);
+  }
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+  .btn-ink:hover {
+    background: var(--color-volt);
+    border-color: var(--color-volt);
+    color: var(--color-white);
+  }
+  /* Link com seta que desliza */
+  .arrow-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-weight: 600;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 2px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.35s var(--ease-out-expo);
+  }
+  .arrow-link:hover {
+    background-size: 100% 2px;
+  }
+  .arrow-link .arrow {
+    transition: transform 0.35s var(--ease-out-expo);
+  }
+  .arrow-link:hover .arrow {
+    transform: translateX(0.25em);
+  }
+  .arrow-link:hover .arrow-ne {
+    transform: translate(0.15em, -0.15em);
+  }
+
+  /* Etiqueta de tecnologia */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.3rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-stretch: 87.5%;
+    letter-spacing: 0.02em;
+    border: 1px solid color-mix(in oklab, currentColor 35%, transparent);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  /* Molduras de captura */
+  .frame-browser {
+    border: 2px solid var(--frame-line, var(--color-ink));
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--frame-bg, var(--color-white));
+  }
+  .frame-browser__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 1.9rem;
+    padding: 0 0.75rem;
+    border-bottom: 2px solid var(--frame-line, var(--color-ink));
+    background: var(--frame-bar, var(--color-paper));
+  }
+  .frame-browser__dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--frame-line, var(--color-ink));
+  }
+  .frame-phone {
+    padding: 0.45rem;
+    border-radius: 2rem;
+    background: var(--color-ink);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-ink) 60%, white);
+  }
+  .frame-phone > * {
+    border-radius: 1.6rem;
+    overflow: hidden;
+  }
+
+  /* Marcas de registro (cruz) — detalhe editorial */
+  .reg-mark {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+  .reg-mark::before,
+  .reg-mark::after {
+    content: "";
+    position: absolute;
+    background: currentColor;
+  }
+  .reg-mark::before {
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: 100%;
+  }
+  .reg-mark::after {
+    top: 50%;
+    left: 0;
+    height: 1px;
+    width: 100%;
+  }
+
+  /* Rolagem horizontal acessível (galerias) */
+  .rail {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: currentColor transparent;
+    padding-bottom: 1rem;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Hero — título cinético
+--------------------------------------------------------------------------- */
+.hero-title {
+  font-size: clamp(2.5rem, 13.6vw, 7.5rem);
+  line-height: 0.86;
+  font-weight: 850;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+}
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: clamp(4.5rem, min(10vw, 17.5vh), 12rem);
+    font-stretch: 125%;
+  }
+}
+.hero-title [data-letter] {
+  display: inline-block;
+  white-space: pre;
+}
+.hero-strike {
+  position: absolute;
+  left: -0.04em;
+  right: -0.04em;
+  top: 50%;
+  height: 0.085em;
+  margin-top: -0.04em;
+  background: var(--color-orange);
+  transform-origin: left center;
+  animation: strike-in 0.9s var(--ease-out-expo) 0.45s both;
+}
+@keyframes strike-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Modo técnico — camada de "planta": grade, rótulos de seção e contornos
+--------------------------------------------------------------------------- */
+.tech-only {
+  display: none;
+}
+[data-tech="on"] .tech-only {
+  display: revert;
+}
+[data-tech="on"] .tech-hide {
+  display: none;
+}
+
+[data-tech="on"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgb(0 209 255 / 0.13) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(0 209 255 / 0.13) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+[data-section] {
+  position: relative;
+}
+[data-tech="on"] [data-section]::before {
+  content: attr(data-section);
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 5;
+  padding: 0.2rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+  background: var(--color-cyan);
+  pointer-events: none;
+}
+[data-tech="on"] .tech-outline {
+  outline: 1px dashed var(--color-cyan);
+  outline-offset: 6px;
+}
+
+/* ---------------------------------------------------------------------------
+   Movimento reduzido: remove transições decorativas
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="full"]) *,
+  html:not([data-motion="full"]) *::before,
+  html:not([data-motion="full"]) *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Controle segmentado (preferência de animações) */
+.seg-option:has(input:focus-visible) {
+  outline: 3px solid var(--focus, var(--color-volt));
+  outline-offset: 2px;
+}
+
+/* Cortina da transição entre páginas (src/lib/transition.tsx) */
+.curtain[data-phase="cover"] {
+  animation: curtain-cover 0.55s var(--ease-curtain) both;
+}
+.curtain[data-phase="reveal"] {
+  animation: curtain-reveal 0.55s var(--ease-curtain) both;
+}
+@keyframes curtain-cover {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes curtain-reveal {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
