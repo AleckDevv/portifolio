@@ -1,13 +1,12 @@
-# Publica o portfólio no GitHub Pages a cada push na branch main.
+# OPCIONAL — publicação alternativa no GitHub Pages (o site principal está na Vercel).
+# Roda só manualmente: aba Actions → "Publicar no GitHub Pages" → Run workflow.
 # Requisito: em Settings → Pages, escolha "Source: GitHub Actions".
 #
-# Repositório AleckDevv.github.io (site de usuário) → deixe BASE_PATH como "/".
-# Outro nome de repositório (site de projeto)       → use BASE_PATH: "/<nome-do-repo>/".
+# Repositório "portifolio" (site de projeto) → BASE_PATH "/portifolio/".
+# Repositório AleckDevv.github.io (site de usuário) → BASE_PATH "/".
 name: Publicar no GitHub Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -23,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      BASE_PATH: "/"
+      BASE_PATH: "/portifolio/"
       VITE_SITE_URL: "https://aleckdevv.github.io"
     steps:
       - uses: actions/checkout@v4

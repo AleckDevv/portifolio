@@ -1,12 +1,14 @@
 // Configuração geral do site (SEO, URLs absolutas e Open Graph).
-//
-// VITE_SITE_URL define o endereço público usado em links canônicos, sitemap e
-// Open Graph. Exemplo: VITE_SITE_URL=https://aleckdevv.github.io npm run build
 
-const fallbackUrl = "https://aleckdevv.github.io";
+/**
+ * Endereço público do portfólio (domínio de produção na Vercel).
+ * É usado nos links canônicos, no sitemap e nas imagens de compartilhamento.
+ * Ao trocar de domínio, altere aqui — ou defina VITE_SITE_URL no build.
+ */
+export const PRODUCTION_URL = "https://portifolioalexsoares.vercel.app";
 
 export const site = {
-  url: (import.meta.env.VITE_SITE_URL || fallbackUrl).replace(/\/+$/, ""),
+  url: (import.meta.env.VITE_SITE_URL || PRODUCTION_URL).replace(/\/+$/, ""),
   title: "AleckDevv — Alex Soares Lopes, desenvolvedor full stack",
   shortTitle: "AleckDevv",
   description:

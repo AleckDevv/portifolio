@@ -79,7 +79,15 @@ O build gera um site 100% estático em `dist/` (cada rota tem seu `index.html`, 
 
 ### Vercel (configuração pronta)
 
-O arquivo `vercel.json` já define tudo: `npm ci`, `npm run build` (com a pré-renderização), pasta `dist`, Node 24, barra final nas URLs, cabeçalhos de segurança (CSP com hash do script inline, `nosniff`, bloqueio de iframe) e cache longo para os arquivos com hash. A URL pública usada no canonical, no sitemap e no Open Graph vem automaticamente do domínio de produção do projeto na Vercel (`VERCEL_PROJECT_PRODUCTION_URL`) — não é preciso configurar variáveis.
+O arquivo `vercel.json` já define tudo: `npm ci`, `npm run build` (com a pré-renderização), pasta `dist`, Node 24, barra final nas URLs, cabeçalhos de segurança (CSP com hash do script inline, `nosniff`, bloqueio de iframe) e cache longo para os arquivos com hash.
+
+**Endereço do site:** `https://portifolioalexsoares.vercel.app`, definido em `PRODUCTION_URL` (`src/content/site.ts`) e usado no canonical, no sitemap e nas imagens de compartilhamento. Para que esse endereço funcione, ele precisa estar cadastrado no projeto da Vercel:
+
+1. No projeto, abra *Settings → Domains* e adicione `portifolioalexsoares.vercel.app`.
+2. (Opcional) No domínio antigo gerado pela Vercel, escolha *Edit → Redirect to* `portifolioalexsoares.vercel.app`.
+3. (Opcional) Em *Settings → General*, renomeie o projeto para `portifolioalexsoares`.
+
+Para trocar de domínio no futuro, cadastre o novo domínio na Vercel e altere `PRODUCTION_URL`.
 
 **Pelo GitHub (recomendado: cada `git push` publica uma nova versão)**
 
@@ -95,7 +103,7 @@ npx vercel            # cria o projeto e publica uma versão de pré-visualizaç
 npx vercel --prod     # publica na URL de produção
 ```
 
-Para usar um domínio próprio, adicione-o em *Settings → Domains* na Vercel; o próximo deploy já usa esse domínio nas URLs canônicas. Se quiser forçar outro endereço, defina `VITE_SITE_URL` nas variáveis de ambiente do projeto.
+Ao criar o projeto pela CLI, responda `portifolioalexsoares` quando ela perguntar o nome do projeto.
 
 Para testar localmente exatamente como na Vercel (mesmos cabeçalhos e redirecionamentos do `vercel.json`): `npm run build && npm run preview`.
 
@@ -107,10 +115,10 @@ Comando de build `npm run build`, pasta `dist` e a variável `VITE_SITE_URL` com
 
 ### GitHub Pages
 
-O workflow `.github/workflows/deploy-pages.yml` publica a cada push na `main` (em *Settings → Pages*, escolha *Source: GitHub Actions*).
+Alternativa opcional ao deploy na Vercel. O workflow `.github/workflows/deploy-pages.yml` roda só manualmente (aba *Actions → Publicar no GitHub Pages → Run workflow*), depois de ativar *Settings → Pages → Source: GitHub Actions*.
 
-- **Repositório `AleckDevv.github.io`** (site de usuário, URL `https://aleckdevv.github.io`): mantenha `BASE_PATH: "/"`.
-- **Outro nome de repositório** (ex.: `portfolio`): use `BASE_PATH: "/portfolio/"` e `VITE_SITE_URL: "https://aleckdevv.github.io"` no workflow.
+- **Repositório `portifolio`** (site de projeto, `https://aleckdevv.github.io/portifolio/`): `BASE_PATH: "/portifolio/"` (já configurado).
+- **Repositório `AleckDevv.github.io`** (site de usuário, `https://aleckdevv.github.io`): use `BASE_PATH: "/"`.
 
 ## Estrutura
 

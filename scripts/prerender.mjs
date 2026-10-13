@@ -54,8 +54,5 @@ await writeFile(
 );
 await writeFile(path.join(DIST, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${server.absoluteUrl("/sitemap.xml")}\n`);
 console.log(`  ✓ sitemap.xml e robots.txt (site: ${server.site.url})`);
-if (!process.env.VITE_SITE_URL && !process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-  console.warn(`! VITE_SITE_URL não definida: usando ${server.site.url} nas URLs absolutas. Veja o README.`);
-}
 
 await rm(SSR_DIR, { recursive: true, force: true });
