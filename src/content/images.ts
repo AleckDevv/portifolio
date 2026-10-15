@@ -11,6 +11,10 @@ interface RawEntry {
   o: "demo" | "repo";
   c: string;
   s: number[];
+  /** 1 quando existe a planta (contornos) da tela. */
+  e?: 1;
+  /** 1 quando existe a planta pequena (capas, usadas na abertura). */
+  i?: 1;
 }
 
 export interface ImageEntry {
@@ -23,6 +27,10 @@ export interface ImageEntry {
   /** [largura, caminho relativo a public/] */
   avif: Array<[number, string]>;
   webp: Array<[number, string]>;
+  /** Planta da tela (contornos com transparência), usada como máscara na animação de renderização. */
+  edges: string | null;
+  /** Planta pequena (640 px) das capas, usada nas cartas da abertura. */
+  edgesSmall: string | null;
 }
 
 const raw = manifest as unknown as Record<ImageId, RawEntry>;
@@ -30,7 +38,16 @@ const raw = manifest as unknown as Record<ImageId, RawEntry>;
 export function getImage(id: ImageId): ImageEntry {
   const entry = raw[id];
   const list = (format: "avif" | "webp") => entry.s.map((width): [number, string] => [width, `images/${id}-${width}.${format}`]);
-  return { width: entry.w, height: entry.h, origin: entry.o, color: entry.c, avif: list("avif"), webp: list("webp") };
+  return {
+    width: entry.w,
+    height: entry.h,
+    origin: entry.o,
+    color: entry.c,
+    avif: list("avif"),
+    webp: list("webp"),
+    edges: entry.e ? `images/${id}.edges.webp` : null,
+    edgesSmall: entry.i ? `images/${id}.edges-sm.webp` : null,
+  };
 }
 
 export function hasImage(id: string): id is ImageId {

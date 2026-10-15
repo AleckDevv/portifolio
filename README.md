@@ -50,7 +50,7 @@ As capturas brutas ficam em `assets-src/` (fora do Git). Para regenerar:
 npm run capture              # captura as demos publicadas (usa o Google Chrome instalado)
 npm run capture -- vieira    # só um projeto
 npm run fetch:repo-images    # baixa as capturas que já existem nos repositórios (IaWorkout, Agência)
-npm run images               # gera AVIF/WebP em public/images e o manifesto tipado
+npm run images               # gera AVIF/WebP, as plantas (<nome>.edges.webp) e o manifesto tipado
 npm run og                   # gera as imagens Open Graph e os ícones
 ```
 
@@ -73,7 +73,7 @@ npm run check:links   # confere repositórios, demonstrações e contatos (HTTP)
 npm run audit:demos   # mede rolagem horizontal e erros de JS nas demos publicadas
 ```
 
-Resultado da última execução (15/10/2026): lint sem avisos, 21 testes unitários e 77 testes de ponta a ponta aprovados (desktop 1440 px e celular 390 px), auditoria axe sem violações graves (WCAG 2.2 AA), nenhuma rolagem horizontal de 320 a 1920 px e 19 links externos respondendo.
+Resultado da última execução (15/10/2026): lint sem avisos, 21 testes unitários e 96 testes de ponta a ponta aprovados (desktop 1440 px e celular 390 px), auditoria axe sem violações graves (WCAG 2.2 AA), nenhuma rolagem horizontal de 320 a 1920 px e 19 links externos respondendo.
 
 Para revisar visualmente: com `npm run preview` rodando, `node scripts/review-screens.mjs` salva capturas do próprio portfólio em várias larguras.
 
@@ -138,6 +138,32 @@ scripts/         captura, otimização, OG, pré-renderização, servidor e veri
 tests/           unit (Vitest) e e2e (Playwright)
 docs/            relatório de verificação dos projetos
 ```
+
+## Animação das telas — "do código à tela"
+
+Cada captura de projeto chega primeiro como **planta**: os contornos da própria interface, gerados no build (`scripts/optimize-images.mjs`, detecção de bordas com sharp) e pintados em ciano sobre uma grade azul-noite. Quando a tela entra na área visível, as linhas são desenhadas e uma **linha de renderização** amarela desce pintando a tela real (`src/components/media/RenderShot.tsx`). Nas abas do Vieira, cada troca de módulo renderiza a nova tela.
+
+- **Raio-x:** com mouse, uma lente circular mostra a planta por baixo da tela, e a moldura inclina na direção do cursor com um brilho.
+- **Subida em 3D:** as molduras sobem e endireitam enquanto entram na tela, guiadas pela rolagem (CSS `animation-timeline: view()`; sem suporte, ficam estáticas).
+- **Leveza:** a planta (~30 KB) só é baixada quando a tela se aproxima. O HTML pré-renderizado mostra as imagens prontas, e o efeito só é armado para telas que ainda não apareceram.
+- **Sem efeito:** com movimento reduzido, em aparelhos limitados e no toque (raio-x e inclinação), as telas aparecem prontas.
+
+## Abertura — "o portfólio se compila na sua frente"
+
+A cada entrada ou recarregamento da página inicial, uma abertura de ~3 s (`src/components/intro/Intro.tsx`):
+
+1. **Registro:** painel azul-noite com marcas de registro nos cantos (nome, papel, cidade, número de projetos) e a grade técnica.
+2. **Maço de projetos:** as capas dos 10 projetos são distribuídas como cartas, cada uma com a planta da própria interface. Um letreiro passa o nome de cada projeto (sem porcentagens nem barras). Ao fundo, "Problemas entram." em contorno gigante.
+3. **Renderização:** a linha ácida renderiza a carta do topo (o projeto mais recente) e o fundo vira "Software sai.".
+4. **Entrega:** o painel sobe com a borda curva e o título do hero sobe linha a linha — a abertura termina dentro do site, não antes dele.
+
+Referências: o preloader que se transforma no topo da página (Hildén & Kaira, Awwwards), a pilha de imagens de introdução (Codrops, *Image Stack Intro Animation*), os preloaders tipográficos (Monolith/CUSP, Awwwards) e as cortinas curvas de entrada.
+
+- **Antes do JavaScript:** a decisão é do script inline de `index.html` (atributo `data-intro` no `<html>`, com hash na CSP de `vercel.json`) e toda a sequência é CSS. Sem JavaScript, nada bloqueia a página.
+- **Pular:** clique, qualquer tecla, rolagem ou toque adiantam a sequência direto para a cortina.
+- **Recomeça do zero:** entrar ou recarregar a página inicial volta ao topo, descarta a âncora da última seção visitada (`#projetos`, `#contato`…) e não restaura a rolagem anterior — tudo decidido antes da primeira pintura.
+- **Quando não toca:** com movimento reduzido, em quem chega direto a um estudo de caso e ao voltar/avançar no histórico (aí o navegador mantém a posição).
+- **Peso:** as cartas usam plantas pequenas (~12 KB cada, `<nome>.edges-sm.webp`, geradas só para as capas).
 
 ## Acessibilidade e desempenho
 

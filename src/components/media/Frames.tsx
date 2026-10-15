@@ -1,6 +1,9 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Shot } from "../../content/projects";
-import { Picture } from "./Picture";
+import { RenderShot } from "./RenderShot";
+
+// Cada moldura fica num "palco" com perspectiva: a moldura sobe em 3D durante a
+// rolagem e inclina na direção do cursor (data-tilt, controlado por RenderShot).
 
 interface BrowserFrameProps {
   /** Texto da barra de endereço (ex.: domínio da demo). */
@@ -12,22 +15,26 @@ interface BrowserFrameProps {
 
 export function BrowserFrame({ address, children, className, style }: BrowserFrameProps) {
   return (
-    <div className={`frame-browser ${className ?? ""}`} style={style}>
-      <div className="frame-browser__bar" aria-hidden="true">
-        <span className="frame-browser__dot" />
-        <span className="frame-browser__dot" />
-        <span className="frame-browser__dot" />
-        <span className="ml-2 min-w-0 truncate font-mono text-[0.62rem] tracking-wide opacity-70">{address}</span>
+    <div className={`frame-stage ${className ?? ""}`} style={style}>
+      <div className="frame-browser" data-tilt="browser">
+        <div className="frame-browser__bar" aria-hidden="true">
+          <span className="frame-browser__dot" />
+          <span className="frame-browser__dot" />
+          <span className="frame-browser__dot" />
+          <span className="ml-2 min-w-0 truncate font-mono text-[0.62rem] tracking-wide opacity-70">{address}</span>
+        </div>
+        {children}
       </div>
-      {children}
     </div>
   );
 }
 
 export function PhoneFrame({ children, className, style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
-    <div className={`frame-phone ${className ?? ""}`} style={style}>
-      <div>{children}</div>
+    <div className={`frame-stage ${className ?? ""}`} style={style}>
+      <div className="frame-phone" data-tilt="phone">
+        <div>{children}</div>
+      </div>
     </div>
   );
 }
@@ -66,7 +73,7 @@ interface ShotViewProps {
 
 /** Captura dentro da moldura adequada ao dispositivo, com legenda. */
 export function ShotView({ shot, sizes, address, priority, showCaption = true, className, frameClassName }: ShotViewProps) {
-  const picture = <Picture id={shot.image} alt={shot.alt} sizes={sizes} priority={priority} />;
+  const picture = <RenderShot id={shot.image} alt={shot.alt} sizes={sizes} priority={priority} />;
   return (
     <figure className={className}>
       {shot.device === "mobile" ? (

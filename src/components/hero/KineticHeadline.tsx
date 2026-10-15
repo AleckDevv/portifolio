@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { HeadlineLine } from "../../content/profile";
+import { INTRO_REVEAL, introPlaying } from "../../lib/intro";
 import { useCursorEffects, usePrefs } from "../../lib/prefs-store";
 
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -49,13 +50,20 @@ export function KineticHeadline({ lines, id }: { lines: HeadlineLine[]; id?: str
     }, 45);
   };
 
-  // "Recompila" a linha de destaque uma vez depois da hidratação.
+  // "Recompila" a linha de destaque uma vez depois da hidratação — ou, com a
+  // abertura tocando, logo que a cortina sobe e o título começa a aparecer.
   useEffect(() => {
     if (reduceMotion) return;
     const root = ref.current;
     const timer = decodeTimer;
-    const timeout = window.setTimeout(decode, 350);
+    let timeout: number | undefined;
+    const start = () => {
+      timeout = window.setTimeout(decode, 350);
+    };
+    if (introPlaying()) window.addEventListener(INTRO_REVEAL, start, { once: true });
+    else start();
     return () => {
+      window.removeEventListener(INTRO_REVEAL, start);
       window.clearTimeout(timeout);
       if (timer.current) window.clearInterval(timer.current);
       root?.querySelectorAll<HTMLElement>("[data-letter]").forEach((el) => {

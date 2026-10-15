@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { projects } from "../../src/content/projects";
 import { horizontalOverflow, scrollThrough, trackErrors } from "./helpers";
 
@@ -139,4 +139,42 @@ test.describe("responsividade", () => {
       }
     });
   }
+});
+
+test.describe("renderização das telas", () => {
+  test("telas fora da área visível chegam como planta e são renderizadas ao aparecer", async ({ page }) => {
+    const errors = trackErrors(page);
+    await page.goto("/");
+    const shot = page.locator("#pilates .render").first();
+    await expect(shot).toHaveAttribute("data-render", "armed");
+    await shot.scrollIntoViewIfNeeded();
+    await expect(shot).toHaveAttribute("data-render", /render|done/);
+    await expect(shot).toHaveAttribute("data-render", "done", { timeout: 6000 });
+    // A imagem real continua acessível pelo texto alternativo durante todo o efeito.
+    await expect(shot.getByRole("img")).toHaveAttribute("alt", /Agenda semanal/);
+    expect(errors).toEqual([]);
+  });
+
+  test("com movimento reduzido, as telas aparecem prontas", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const shot = page.locator("#pilates .render").first();
+    await shot.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+    await expect(shot).toHaveAttribute("data-render", "static");
+  });
+
+  test("lente de raio-x acompanha o cursor", async ({ page, isMobile }) => {
+    test.skip(isMobile, "efeito só com mouse");
+    await page.goto("/#pilates");
+    const shot = page.locator("#pilates .render").first();
+    await shot.scrollIntoViewIfNeeded();
+    await expect(shot).toHaveAttribute("data-render", /static|done/, { timeout: 6000 });
+    const box = (await shot.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width / 2 + 20, box.y + box.height / 2 + 10, { steps: 4 });
+    await expect(shot).toHaveAttribute("data-xray", "on");
+    await page.mouse.move(5, 5);
+    await expect(shot).not.toHaveAttribute("data-xray", "on");
+  });
 });

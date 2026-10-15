@@ -95,7 +95,21 @@ describe("projetos", () => {
           expect(existsSync(full), file).toBe(true);
           expect(statSync(full).size, file).toBeGreaterThan(1000);
         }
+        // Planta usada na animação de renderização (páginas inteiras rolam e não usam o efeito).
+        if (!shot.image.endsWith("-full")) {
+          expect(image.edges, shot.image).not.toBeNull();
+          const edges = path.join(ROOT, "public", image.edges!);
+          expect(existsSync(edges), shot.image).toBe(true);
+          // Uma planta vazia (só transparência) tem ~1,5 KB; com contornos, bem mais.
+          expect(statSync(edges).size, `${shot.image}: planta vazia`).toBeGreaterThan(4000);
+        }
       }
+    }
+    // As capas também têm a planta pequena, usada nas cartas da abertura.
+    for (const project of projects) {
+      const cover = getImage(project.shots[0]!.image);
+      expect(cover.edgesSmall, project.slug).not.toBeNull();
+      expect(statSync(path.join(ROOT, "public", cover.edgesSmall!)).size, project.slug).toBeGreaterThan(2500);
     }
   });
 

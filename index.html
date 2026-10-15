@@ -12,14 +12,37 @@
     <link rel="manifest" href="/site.webmanifest" />
     <!--app-head--><title>AleckDevv — Alex Soares Lopes</title><!--/app-head-->
     <script>
-      // Aplica as preferências salvas antes da primeira pintura (sem "piscar").
+      // Antes da primeira pintura (sem "piscar"): aplica as preferências salvas e
+      // decide como a página inicial começa (src/lib/intro.ts).
       (function () {
+        var root = document.documentElement;
         try {
-          var root = document.documentElement;
           if (localStorage.getItem("aleckdevv:tech") === "on") root.dataset.tech = "on";
           var motion = localStorage.getItem("aleckdevv:motion");
           if (motion === "reduce" || motion === "full") root.dataset.motion = motion;
         } catch (error) {}
+        try {
+          var parts = location.pathname.split("/").filter(Boolean);
+          var home = parts.length === 0 || (parts.length === 1 && /^(portifolio|index\.html)$/.test(parts[0]));
+          var entry = performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+          var back = !!entry && entry.type === "back_forward";
+          // Entrar ou recarregar a página inicial recomeça do zero: topo, sem a
+          // âncora da última seção visitada e sem restaurar a rolagem anterior.
+          // Voltar/avançar no histórico mantém o comportamento do navegador.
+          if (home && !back) {
+            if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+            if (location.hash) history.replaceState(history.state, "", location.pathname + location.search);
+          }
+          var reduce =
+            root.dataset.motion === "reduce" ||
+            (root.dataset.motion !== "full" && matchMedia("(prefers-reduced-motion: reduce)").matches);
+          // A abertura toca a cada entrada ou recarregamento da página inicial,
+          // nunca com movimento reduzido ("off" desliga, usado nos testes).
+          var off = sessionStorage.getItem("aleckdevv:intro") === "off";
+          root.dataset.intro = home && !back && !reduce && !off ? "play" : "skip";
+        } catch (error) {
+          root.dataset.intro = "skip";
+        }
       })();
     </script>
   </head>

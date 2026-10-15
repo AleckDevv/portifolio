@@ -316,6 +316,210 @@
     overflow: hidden;
   }
 
+  /* Palco das molduras: perspectiva para a subida em 3D e a inclinação pelo cursor */
+  .frame-stage {
+    perspective: 1600px;
+  }
+  .frame-stage > [data-tilt] {
+    position: relative;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.7s var(--ease-out-expo);
+  }
+  .frame-stage > [data-tilt][data-hover] {
+    transition-duration: 0.18s;
+  }
+  /* Brilho que acompanha o cursor */
+  .frame-stage > [data-tilt]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(34rem circle at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / 0.2), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .frame-stage > [data-tilt][data-hover]::after {
+    opacity: 1;
+  }
+
+  /* ---- Renderização da tela (src/components/media/RenderShot.tsx) ---- */
+  .render {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    container-type: inline-size;
+    --lr: clamp(46px, 13cqi, 118px);
+  }
+  /* ordem: planta (0) → tela real (1) → varredura e raio-x (2) */
+  .render__img {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+  }
+  .render__bp,
+  .render__xray {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* planta: azul-noite com grade técnica */
+    background-color: var(--color-ink);
+    background-image:
+      linear-gradient(rgb(0 209 255 / 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(0 209 255 / 0.09) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .render__lines {
+    position: absolute;
+    inset: 0;
+    background: var(--color-cyan);
+    /* sem a planta carregada, a máscara fica transparente (nada aparece) */
+    mask-image: var(--edges, linear-gradient(transparent, transparent));
+    mask-position: center;
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+  }
+  .render[data-fit="cover-top"] .render__lines {
+    mask-size: cover;
+    mask-position: center top;
+  }
+  .render__draw {
+    position: absolute;
+    inset: 0;
+    filter: drop-shadow(0 0 3px rgb(0 209 255 / 0.65));
+    mask: linear-gradient(100deg, #000 42%, transparent 58%) 0 0 / 260% 100% no-repeat;
+  }
+  .render__bp {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .render__scan {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+  }
+  /* linha de renderização em amarelo-ácido, com um rastro de luz acima dela */
+  .render__scan::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--color-acid);
+    box-shadow:
+      0 0 14px 2px rgb(227 255 59 / 0.75),
+      0 0 42px 6px rgb(227 255 59 / 0.3);
+  }
+  .render__scan::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 100%;
+    height: 80px;
+    background: linear-gradient(to top, rgb(227 255 59 / 0.2), transparent);
+  }
+  .render__tag {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--color-acid);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  @container (max-width: 300px) {
+    .render__tag {
+      display: none;
+    }
+  }
+
+  /* fases: armada (planta à espera) → render (linhas desenhadas + varredura) → pronta */
+  .render[data-render="armed"] .render__bp,
+  .render[data-render="render"] .render__bp,
+  .render[data-render="replay"] .render__bp {
+    opacity: 1;
+    visibility: visible;
+  }
+  .render[data-render="armed"] .render__img {
+    clip-path: inset(0 0 100% 0);
+  }
+  .render[data-render="armed"] .render__draw {
+    mask-position: 100% 0;
+  }
+  .render[data-render="render"] .render__draw {
+    animation: render-draw 0.7s var(--ease-out-expo) both;
+  }
+  .render[data-render="render"] .render__img {
+    animation: render-sweep 1.15s var(--ease-curtain) 0.6s both;
+  }
+  .render[data-render="render"] .render__scan {
+    animation: render-scan 1.15s var(--ease-curtain) 0.6s both;
+  }
+  .render[data-render="render"] .render__bp {
+    animation: render-fade 0.4s ease 1.75s both;
+  }
+  .render[data-render="replay"] .render__img {
+    animation: render-sweep 0.75s var(--ease-curtain) both;
+  }
+  .render[data-render="replay"] .render__scan {
+    animation: render-scan 0.75s var(--ease-curtain) both;
+  }
+  .render[data-render="replay"] .render__bp {
+    animation: render-fade 0.25s ease 0.75s both;
+  }
+
+  /* lente de raio-x: a planta aparece num círculo que segue o cursor */
+  .render__xray {
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    mask: radial-gradient(circle var(--lr) at var(--lx, 50%) var(--ly, 50%), #000 calc(100% - 1px), transparent 100%);
+  }
+  .render__ring {
+    position: absolute;
+    z-index: 2;
+    left: var(--lx, 50%);
+    top: var(--ly, 50%);
+    width: calc(var(--lr) * 2);
+    height: calc(var(--lr) * 2);
+    translate: -50% -50%;
+    border: 1.5px solid var(--color-acid);
+    border-radius: 999px;
+    pointer-events: none;
+    opacity: 0;
+    scale: 0.6;
+    transition:
+      opacity 0.25s ease,
+      scale 0.35s var(--ease-out-expo);
+  }
+  .render__ring > span {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    translate: -50% 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--color-ink);
+    color: var(--color-acid);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .render[data-xray="on"] .render__xray,
+  .render[data-xray="on"] .render__ring {
+    opacity: 1;
+    scale: 1;
+  }
+
   /* Marcas de registro (cruz) — detalhe editorial */
   .reg-mark {
     position: absolute;
@@ -493,5 +697,530 @@ html[data-motion="reduce"] *::after {
   }
   to {
     clip-path: inset(0 0 100% 0);
+  }
+}
+
+/* Renderização das telas (src/components/media/RenderShot.tsx) */
+@keyframes render-draw {
+  from {
+    mask-position: 100% 0;
+  }
+  to {
+    mask-position: 0 0;
+  }
+}
+@keyframes render-sweep {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes render-scan {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+@keyframes render-fade {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* As molduras sobem em 3D enquanto entram na tela, guiadas pela própria rolagem.
+   Só transformações individuais (translate/scale/rotate), que se somam à
+   inclinação pelo cursor. Sem suporte a scroll-driven animations: molduras estáticas. */
+@keyframes frame-rise {
+  from {
+    translate: 0 64px;
+    scale: 0.9;
+    rotate: x 18deg;
+  }
+  to {
+    translate: 0 0;
+    scale: 1;
+    rotate: x 0deg;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion="reduce"]) .frame-stage > [data-tilt] {
+      transform-origin: 50% 100%;
+      animation: frame-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 42%;
+    }
+  }
+  html[data-motion="full"] .frame-stage > [data-tilt] {
+    transform-origin: 50% 100%;
+    animation: frame-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 42%;
+  }
+}
+
+/* ===========================================================================
+   Entrada do título do hero: cada linha sobe de dentro de uma máscara e se
+   abre na largura. Sem abertura, começa logo; com abertura, quando a cortina sobe.
+=========================================================================== */
+.hero-title [data-line] {
+  /* recorte só na vertical; na horizontal sobra espaço para o efeito do cursor */
+  clip-path: inset(-0.35em -100vw -0.16em -100vw);
+}
+.hero-title [data-line] > span {
+  transform-origin: left bottom;
+  animation: hero-line-in 1.1s var(--ease-out-expo) calc(var(--hero-delay, 0.1s) + var(--line-delay, 0ms)) both;
+}
+.hero-title [data-line].text-right > span {
+  transform-origin: right bottom;
+}
+.hero-title [data-line]:nth-child(2) > span {
+  --line-delay: 90ms;
+}
+.hero-title [data-line]:nth-child(3) > span {
+  --line-delay: 180ms;
+}
+.hero-title [data-line]:nth-child(4) > span {
+  --line-delay: 270ms;
+}
+@keyframes hero-line-in {
+  from {
+    transform: translateY(108%) scaleX(0.82);
+  }
+}
+html[data-intro="play"] {
+  --hero-delay: 2.5s;
+}
+html[data-intro="play"] .hero-strike {
+  animation-delay: 2.95s;
+}
+
+/* ===========================================================================
+   Abertura (src/components/intro/Intro.tsx) — só com data-intro="play".
+   Linha do tempo: marcas 0–0,6 s · cartas 0,45–1,4 s · renderização 1,5–2,1 s
+   · cortina 2,15–3 s. Pular adianta tudo até a cortina (JS).
+=========================================================================== */
+.intro {
+  display: none;
+}
+html[data-intro="play"] .intro {
+  --deal: 360ms;
+  --step: 95ms;
+  --render: 1500ms;
+  --exit: 2150ms;
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: var(--color-ink);
+  color: var(--color-white);
+  cursor: pointer;
+  user-select: none;
+  animation: intro-exit 0.85s var(--ease-curtain) var(--exit) both;
+}
+@keyframes intro-exit {
+  to {
+    transform: translateY(calc(-100% - 18vh));
+    visibility: hidden;
+  }
+}
+/* borda curva que acompanha a subida e se achata no fim */
+.intro__curve {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: -15%;
+  width: 130%;
+  height: 16vh;
+  border-radius: 0 0 50% 50%;
+  background: var(--color-ink);
+  transform-origin: top center;
+}
+html[data-intro="play"] .intro__curve {
+  animation: intro-curve 0.85s var(--ease-curtain) var(--exit) both;
+}
+@keyframes intro-curve {
+  to {
+    scale: 1 0;
+  }
+}
+
+.intro__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgb(0 209 255 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 209 255 / 0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center;
+  mask-image: radial-gradient(ellipse at center, #000 25%, transparent 72%);
+  animation: intro-fade 0.9s ease 0.05s both;
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* marcas de registro e rótulos nos cantos */
+.intro__corner {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.78);
+}
+.intro__corner--tl {
+  top: 1.5rem;
+  left: 1.5rem;
+}
+.intro__corner--tr {
+  top: 1.5rem;
+  right: 1.5rem;
+  flex-direction: row-reverse;
+}
+.intro__corner--bl {
+  bottom: 1.5rem;
+  left: 1.5rem;
+}
+.intro__corner--br {
+  bottom: 1.5rem;
+  right: 1.5rem;
+  flex-direction: row-reverse;
+}
+.intro__mark {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  animation: intro-mark 0.6s var(--ease-out-expo) calc(var(--k) * 60ms + 80ms) both;
+}
+.intro__mark::before,
+.intro__mark::after {
+  content: "";
+  position: absolute;
+  background: var(--color-cyan);
+}
+.intro__mark::before {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+}
+.intro__mark::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1.5px;
+  margin-left: -0.75px;
+}
+@keyframes intro-mark {
+  from {
+    opacity: 0;
+    rotate: -90deg;
+    scale: 0.2;
+  }
+}
+.intro__label {
+  display: block;
+  overflow: hidden;
+}
+.intro__label > span {
+  display: block;
+  animation: intro-rise 0.7s var(--ease-out-expo) calc(var(--k) * 60ms + 160ms) both;
+}
+@keyframes intro-rise {
+  from {
+    transform: translateY(110%);
+  }
+}
+
+/* frase ao fundo: "Problemas entram." em contorno → "Software sai." em ácido */
+.intro__word {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  white-space: nowrap;
+  font-size: clamp(3.2rem, 15vw, 16rem);
+  font-weight: 850;
+  font-stretch: 125%;
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+.intro__word--in {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.24);
+  animation:
+    intro-drift-in 1.5s var(--ease-out-expo) 0.1s both,
+    intro-drift-away 0.55s var(--ease-curtain) var(--render) forwards;
+}
+@keyframes intro-drift-in {
+  from {
+    opacity: 0;
+    transform: translateX(16%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-2%);
+  }
+}
+@keyframes intro-drift-away {
+  from {
+    opacity: 1;
+    transform: translateX(-2%);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-14%);
+  }
+}
+.intro__word--out {
+  color: var(--color-acid);
+  animation: intro-word-out 0.9s var(--ease-out-expo) calc(var(--render) + 0.12s) both;
+}
+@keyframes intro-word-out {
+  from {
+    opacity: 0;
+    transform: translateX(12%) scaleX(0.8);
+  }
+}
+
+/* maço de cartas: as capas dos projetos com a planta de cada interface */
+.intro__stack {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(15rem, 40vw, 36rem);
+  aspect-ratio: 16 / 10;
+  translate: -50% -56%;
+}
+.intro__card {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgb(0 209 255 / 0.38);
+  border-radius: 12px;
+  background: #0e1636;
+  box-shadow: 0 32px 70px -24px rgb(0 0 0 / 0.65);
+  transform: translate(var(--x), var(--y)) rotate(var(--r));
+  animation: intro-deal 0.55s var(--ease-out-expo) calc(var(--deal) + var(--i) * var(--step)) both;
+}
+@keyframes intro-deal {
+  from {
+    opacity: 0;
+    transform: translate(var(--x), calc(var(--y) + 110px)) rotate(calc(var(--r) * 2 - 6deg)) scale(0.88);
+  }
+}
+.intro__bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 10px;
+  border-bottom: 1px solid rgb(0 209 255 / 0.25);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: rgb(255 255 255 / 0.72);
+}
+.intro__bar i {
+  width: 6px;
+  height: 6px;
+  border: 1px solid rgb(0 209 255 / 0.65);
+  border-radius: 999px;
+}
+.intro__bar span {
+  margin-left: 6px;
+}
+.intro__bp,
+.intro__render {
+  position: absolute;
+  inset: 22px 0 0;
+}
+.intro__bp {
+  background-image:
+    linear-gradient(rgb(0 209 255 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 209 255 / 0.08) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.intro__lines {
+  position: absolute;
+  inset: 0;
+  background: var(--color-cyan);
+  mask-image: var(--edges, linear-gradient(transparent, transparent));
+  mask-size: cover;
+  mask-position: center top;
+  mask-repeat: no-repeat;
+}
+/* a carta do topo é renderizada pela linha ácida */
+.intro__render {
+  clip-path: inset(0 0 100% 0);
+  animation: intro-sweep 0.62s var(--ease-curtain) var(--render) both;
+}
+@keyframes intro-sweep {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.intro__scan {
+  position: absolute;
+  inset: 22px 0 0;
+  opacity: 0;
+  animation: intro-scan 0.62s var(--ease-curtain) var(--render) forwards;
+}
+.intro__scan::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--color-acid);
+  box-shadow:
+    0 0 14px 2px rgb(227 255 59 / 0.75),
+    0 0 42px 6px rgb(227 255 59 / 0.3);
+}
+.intro__scan > span {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--color-acid);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+@keyframes intro-scan {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+/* letreiro com o nome de cada projeto, trocando junto com as cartas */
+.intro__ticker {
+  position: absolute;
+  top: calc(100% + 1.6rem);
+  left: 0;
+  right: 0;
+  height: 1.5em;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  animation: intro-fade 0.4s ease var(--deal) both;
+}
+.intro__ticker ol {
+  animation: intro-ticker calc(var(--step) * 9) steps(9, end) var(--deal) both;
+}
+.intro__ticker li {
+  height: 1.5em;
+  line-height: 1.5em;
+  white-space: nowrap;
+}
+.intro__ticker b {
+  margin-right: 0.6em;
+  color: var(--color-acid);
+}
+@keyframes intro-ticker {
+  to {
+    transform: translateY(-13.5em);
+  }
+}
+
+.intro__skip {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  margin: 0;
+  translate: -50% 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.55);
+  animation: intro-fade 0.6s ease 0.8s both;
+}
+.intro__skip-touch {
+  display: none;
+}
+@media (hover: none) {
+  .intro__skip-mouse {
+    display: none;
+  }
+  .intro__skip-touch {
+    display: inline;
+  }
+}
+
+@media (max-width: 640px) {
+  .intro__corner {
+    gap: 0.5rem;
+    font-size: 0.56rem;
+  }
+  .intro__corner--tl,
+  .intro__corner--tr {
+    top: 1rem;
+  }
+  .intro__corner--bl,
+  .intro__corner--br {
+    bottom: 1rem;
+  }
+  .intro__corner--tl,
+  .intro__corner--bl {
+    left: 1rem;
+  }
+  .intro__corner--tr,
+  .intro__corner--br {
+    right: 1rem;
+  }
+  .intro__corner--bl,
+  .intro__corner--br {
+    max-width: 46%;
+  }
+  .intro__stack {
+    width: 80vw;
+  }
+  .intro__word {
+    font-size: 21vw;
+  }
+  .intro__skip {
+    bottom: 4.2rem;
   }
 }

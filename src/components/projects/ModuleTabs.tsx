@@ -2,7 +2,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import type { Project } from "../../content/projects";
 import { useCursorEffects } from "../../lib/prefs-store";
 import { BrowserFrame } from "../media/Frames";
-import { Picture } from "../media/Picture";
+import { RenderShot } from "../media/RenderShot";
 
 interface ModuleTabsProps {
   project: Project;
@@ -106,9 +106,14 @@ export function ModuleTabs({ project, idPrefix, sizes }: ModuleTabsProps) {
                 <div
                   key={module.id}
                   aria-hidden={index !== active}
-                  className={`[grid-area:1/1] transition-opacity duration-500 ${index === active ? "opacity-100" : "opacity-0"}`}
+                  className={`[grid-area:1/1] transition-opacity duration-500 ${index === active ? "opacity-100" : "pointer-events-none opacity-0"}`}
                 >
-                  <Picture id={module.shot.image} alt={index === active ? module.shot.alt : ""} sizes={sizes} />
+                  <RenderShot
+                    id={module.shot.image}
+                    alt={index === active ? module.shot.alt : ""}
+                    sizes={sizes}
+                    replay={index === active}
+                  />
                 </div>
               ) : null,
             )}

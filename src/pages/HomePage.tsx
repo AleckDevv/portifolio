@@ -1,4 +1,5 @@
 import { Hero } from "../components/hero/Hero";
+import { Intro } from "../components/intro/Intro";
 import { ProjectsSection } from "../components/projects/ProjectsSection";
 import { About } from "../components/sections/About";
 import { Contact } from "../components/sections/Contact";
@@ -10,6 +11,7 @@ export function HomePage() {
   useSeo("/");
   return (
     <>
+      <Intro />
       <Hero />
       <ProjectsSection />
       <Evolution />

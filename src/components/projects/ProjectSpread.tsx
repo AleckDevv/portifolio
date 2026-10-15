@@ -4,7 +4,7 @@ import type { Project, Shot } from "../../content/projects";
 import { usePrefs } from "../../lib/prefs-store";
 import { useParallax } from "../../lib/useParallax";
 import { BrowserFrame, HudFrame, PhoneFrame, ShotView } from "../media/Frames";
-import { Picture } from "../media/Picture";
+import { RenderShot } from "../media/RenderShot";
 import { ScrollShot } from "../media/ScrollShot";
 import { Icon } from "../ui/Icon";
 import { Reveal } from "../ui/Reveal";
@@ -93,7 +93,7 @@ function ModulesSpread({ project }: { project: Project }) {
         <ModuleTabs project={project} idPrefix="home-vieira" sizes="(min-width: 1024px) 66vw, 100vw" />
         <div aria-hidden="true" className="pointer-events-none absolute -right-3 -bottom-14 hidden w-[15%] rotate-[3deg] xl:block">
           <PhoneFrame>
-            <Picture id={phone.image} alt="" sizes="15vw" />
+            <RenderShot id={phone.image} alt="" sizes="15vw" xray={false} />
           </PhoneFrame>
         </div>
       </Reveal>
@@ -124,7 +124,7 @@ function StackSpread({ project }: { project: Project }) {
           <div ref={frontRef} className="absolute right-0 bottom-0 w-[60%] will-change-transform">
             <figure className="rotate-[2deg]">
             <BrowserFrame address={shotAddress(project, front)}>
-              <Picture id={front.image} alt={front.alt} sizes="(min-width: 1024px) 34vw, 60vw" />
+              <RenderShot id={front.image} alt={front.alt} sizes="(min-width: 1024px) 34vw, 60vw" />
             </BrowserFrame>
               <figcaption className="label mt-3 inline-block -rotate-[2deg] rounded-full bg-ink px-3 py-1 text-paper">
                 {front.caption}
@@ -205,7 +205,7 @@ function PortalsSpread({ project }: { project: Project }) {
             {phones.map((item, index) => (
               <figure key={item.image} className={index === 1 ? "mt-16" : ""}>
                 <PhoneFrame>
-                  <Picture id={item.image} alt={item.alt} sizes="(min-width: 1024px) 12vw, 42vw" />
+                  <RenderShot id={item.image} alt={item.alt} sizes="(min-width: 1024px) 12vw, 42vw" />
                 </PhoneFrame>
                 <figcaption className="label mt-3 opacity-80">{item.caption}</figcaption>
               </figure>
@@ -268,12 +268,13 @@ function FilmstripSpread({ project }: { project: Project }) {
           {frames.map((frame, index) => (
             <figure key={frame.image}>
               <div className="aspect-[3/2] overflow-hidden rounded-lg border border-white/15">
-                <Picture
+                <RenderShot
                   id={frame.image}
                   alt={frame.alt}
                   sizes="(min-width: 640px) 34rem, 80vw"
                   className="h-full"
                   imgClassName="h-full w-full object-cover object-top"
+                  fit="cover-top"
                 />
               </div>
               <figcaption className="label mt-3">
@@ -308,7 +309,7 @@ function PipelineSpread({ project }: { project: Project }) {
           {wide.map((item, index) => (
             <figure key={item.image} className={index === 0 ? "lg:col-span-7" : "lg:col-span-5 lg:mt-20"}>
               <div className="overflow-hidden rounded-xl border border-white/15">
-                <Picture id={item.image} alt={item.alt} sizes="(min-width: 1024px) 45vw, 100vw" />
+                <RenderShot id={item.image} alt={item.alt} sizes="(min-width: 1024px) 45vw, 100vw" />
               </div>
               <figcaption className="label mt-3 opacity-80">{item.caption}</figcaption>
             </figure>
@@ -317,7 +318,7 @@ function PipelineSpread({ project }: { project: Project }) {
             {phones.map((item) => (
               <figure key={item.image}>
                 <div className="overflow-hidden rounded-xl border border-white/15">
-                  <Picture id={item.image} alt={item.alt} sizes="(min-width: 1024px) 13vw, 30vw" />
+                  <RenderShot id={item.image} alt={item.alt} sizes="(min-width: 1024px) 13vw, 30vw" />
                 </div>
                 <figcaption className="label mt-2 opacity-80">{item.caption}</figcaption>
               </figure>
@@ -325,7 +326,7 @@ function PipelineSpread({ project }: { project: Project }) {
           </div>
           <figure className="lg:col-span-7">
             <div className="overflow-hidden rounded-xl border border-white/15">
-              <Picture id={students.image} alt={students.alt} sizes="(min-width: 1024px) 45vw, 100vw" />
+              <RenderShot id={students.image} alt={students.alt} sizes="(min-width: 1024px) 45vw, 100vw" />
             </div>
             <figcaption className="label mt-3 opacity-80">{students.caption}</figcaption>
           </figure>
@@ -363,7 +364,7 @@ function HudSpread({ project }: { project: Project }) {
           <figure className="group relative">
             <HudFrame labels={["rec · demo publicada", "1440 × 900"]}>
               <div className="relative overflow-hidden rounded-md">
-                <Picture id={desktop.image} alt={desktop.alt} sizes="(min-width: 1024px) 60vw, 100vw" />
+                <RenderShot id={desktop.image} alt={desktop.alt} sizes="(min-width: 1024px) 60vw, 100vw" />
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,rgb(0_0_0/0.18)_0_1px,transparent_1px_4px)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -466,7 +467,7 @@ function PlateSpread({ project }: { project: Project }) {
           />
           <figure className="absolute bottom-0 left-0 w-[30%] -rotate-[4deg]">
             <PhoneFrame>
-              <Picture id={mobile.image} alt={mobile.alt} sizes="(min-width: 1024px) 15vw, 30vw" />
+              <RenderShot id={mobile.image} alt={mobile.alt} sizes="(min-width: 1024px) 15vw, 30vw" />
             </PhoneFrame>
           </figure>
         </div>

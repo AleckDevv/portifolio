@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { scrollThrough } from "./helpers";
 
 // Auditoria automática de acessibilidade (WCAG 2.2 A/AA) com axe-core.

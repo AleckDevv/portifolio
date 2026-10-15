@@ -95,7 +95,46 @@ async function processImage(file, slug, origin) {
       }
     }
   }
+
+  // "Planta" da tela: contornos da interface usados na animação de renderização
+  // e na lente de raio-x (src/components/media/RenderShot.tsx). As páginas
+  // inteiras (-full) rolam dentro da moldura e não usam o efeito.
+  if (!name.endsWith("-full")) {
+    const target = path.join(OUT_DIR, slug, `${name}.edges.webp`);
+    if (!(await isFresh(target, sourceMtime))) await writeEdges(base(), Math.min(p.widths.at(-1) > 800 ? 1280 : 600, region.width), target);
+    entry.e = 1;
+    // Versão pequena só para as capas: as cartas da abertura (src/components/intro/Intro.tsx).
+    if (covers.has(id)) {
+      const small = path.join(OUT_DIR, slug, `${name}.edges-sm.webp`);
+      if (!(await isFresh(small, sourceMtime))) await writeEdges(base(), Math.min(640, region.width), small);
+      entry.i = 1;
+    }
+  }
   return [id, entry];
+}
+
+/**
+ * Detecta os contornos (Laplaciano sobre a imagem em tons de cinza) e grava
+ * linhas brancas com transparência: o CSS usa o arquivo como máscara e pinta
+ * as linhas na cor que quiser.
+ */
+async function writeEdges(image, width, target) {
+  const { data, info } = await image
+    // Sem isso, capturas com canal alfa saem vazias (a convolução zera o alfa pré-multiplicado).
+    .flatten({ background: "#ffffff" })
+    .resize({ width, withoutEnlargement: true })
+    .greyscale()
+    .blur(0.5)
+    .convolve({ width: 3, height: 3, kernel: [-1, -1, -1, -1, 8, -1, -1, -1, -1] })
+    .linear(3.2, -18)
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const pixels = info.width * info.height;
+  const rgba = Buffer.alloc(pixels * 4, 255);
+  for (let i = 0; i < pixels; i++) rgba[i * 4 + 3] = data[i * info.channels];
+  await sharp(rgba, { raw: { width: info.width, height: info.height, channels: 4 } })
+    .webp({ quality: 60, alphaQuality: 55, effort: 5 })
+    .toFile(target);
 }
 
 async function pool(items, size, fn) {
@@ -110,6 +149,9 @@ async function pool(items, size, fn) {
   await Promise.all(workers);
   return results;
 }
+
+// Capas (primeira imagem de cada projeto): também viram cartas na abertura.
+const covers = new Set(projects.map((p) => p.shots[0].image));
 
 // Imagens usadas pelo site (galerias e módulos).
 const referenced = new Set(
@@ -148,6 +190,15 @@ if (missing.length) throw new Error(`Imagens referenciadas sem arquivo bruto em 
 let removed = 0;
 for (const slug of await readdir(OUT_DIR)) {
   for (const file of await readdir(path.join(OUT_DIR, slug))) {
+    const edges = file.match(/^(.+)\.edges(-sm)?\.webp$/);
+    if (edges) {
+      const owner = manifest[`${slug}/${edges[1]}`];
+      if (!(edges[2] ? owner?.i : owner?.e)) {
+        await rm(path.join(OUT_DIR, slug, file));
+        removed++;
+      }
+      continue;
+    }
     const match = file.match(/^(.+)-(\d+)\.(avif|webp)$/);
     const id = `${slug}/${match?.[1] ?? file}`;
     const width = Number(match?.[2]);
