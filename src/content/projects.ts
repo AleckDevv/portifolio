@@ -1,8 +1,11 @@
 // ============================================================================
-//  PROJETOS — fonte única dos 9 projetos do portfólio.
+//  PROJETOS — fonte única dos 10 projetos do portfólio, do mais recente ao
+//  mais antigo.
 //
 //  Todas as informações foram verificadas nos repositórios (README, código,
-//  dependências) e nas demonstrações publicadas em 13/10/2026. Ao editar:
+//  dependências) e nas demonstrações publicadas em 13/10/2026. O Sistema
+//  Pilates, de repositório privado, foi verificado no código e executado
+//  localmente com dados fictícios. Ao editar:
 //   • não invente funcionalidades nem URLs de demonstração;
 //   • as imagens são referenciadas por ID (veja images.generated.json);
 //   • as tecnologias por ID (veja technologies.ts).
@@ -14,6 +17,7 @@ import type { TechId } from "./technologies";
 export type ProjectSlug =
   | "vieira"
   | "conveniencia"
+  | "pilates"
   | "fotos"
   | "iaworkout"
   | "cyborg"
@@ -26,6 +30,7 @@ export type ProjectSlug =
 export type SpreadLayout =
   | "modules"
   | "stack"
+  | "portals"
   | "filmstrip"
   | "pipeline"
   | "hud"
@@ -53,6 +58,9 @@ export interface PipelineStep {
   detail: string;
 }
 
+/** Repositório público (com link) ou privado (sem link; o aviso aparece no lugar). */
+type RepoLink = { repo: string; privateRepo?: never } | { repo?: never; privateRepo: string };
+
 export interface Project {
   slug: ProjectSlug;
   number: string;
@@ -61,20 +69,21 @@ export interface Project {
   repoName: string;
   kind: "sistema" | "interface";
   category: string;
-  /** Data de criação do repositório (API do GitHub). */
+  /** Data de criação do repositório (API do GitHub) ou, se ele for privado, do primeiro commit. */
   createdAt: string;
   tagline: string;
   summary: string[];
   features: string[];
   stack: Array<{ id: TechId; note?: string }>;
-  links: {
-    repo: string;
+  links: RepoLink & {
     demo?: { url: string; host: "Vercel" | "GitHub Pages"; note?: string };
   };
   /** Galeria (a primeira imagem é a capa). */
   shots: Shot[];
   /** De onde vêm as imagens (exibido junto da galeria). */
   imageSource: string;
+  /** Barra de endereço das capturas feitas fora de uma demo publicada. */
+  captureAddress?: string;
   /** Observações públicas de contexto/transparência. */
   notes?: string[];
   /**
@@ -428,8 +437,166 @@ export const projects: Project[] = [
 
   // ------------------------------------------------------------------ 03
   {
-    slug: "fotos",
+    slug: "pilates",
     number: "03",
+    name: "Sistema Pilates",
+    repoName: "Sistema-Pilates",
+    kind: "sistema",
+    category: "Sistema web full stack · Gestão de estúdio de Pilates e fisioterapia",
+    createdAt: "2026-05-26",
+    tagline:
+      "Gestão de um estúdio de Pilates e fisioterapia: agenda, presença, mensalidades com PIX e um portal para cada aluno — em TypeScript de ponta a ponta.",
+    summary: [
+      "Sistema feito para a rotina de um estúdio de Pilates e fisioterapia. A equipe trabalha em um painel administrativo com quatro perfis de acesso — administração, professor, recepção e financeiro — e cada aluno tem o próprio portal para acompanhar aulas, frequência, avaliações e pagamentos.",
+      "A API em Fastify concentra as regras: conflito de horário do professor, capacidade das turmas, mensalidade seguinte gerada assim que a anterior é quitada, vencimentos conferidos por tarefas agendadas e cobrança PIX pelo Mercado Pago. O frontend usa React com TanStack Query, e o ambiente sobe com Docker Compose (MySQL, API, frontend e Nginx).",
+    ],
+    features: [
+      "Agenda em lista e em visão semanal, com aulas individuais, em dupla ou em grupo, lançamento em lote para vários dias e bloqueio de conflito de horário do professor",
+      "Registro de presença por aula, frequência do aluno em calendário e anotações de evolução vinculadas à aula",
+      "Cancelamento, suspensão e exclusão de aulas com justificativa obrigatória, além de reagendamento e reposições",
+      "Mensalidades por plano com geração automática, baixa manual com data, reembolsos e comprovantes enviados pelo aluno e analisados pela equipe",
+      "Cobrança PIX com QR Code pelo Mercado Pago, confirmada por webhook com assinatura verificada",
+      "Acompanhamento do risco de evasão a partir da frequência dos últimos 30 dias e da situação financeira de cada aluno",
+      "Pacotes de sessões, avaliações físicas com medidas e relatórios com gráficos e exportação para Excel",
+      "Portal do aluno com aulas, frequência, financeiro, avaliações, notificações e assistente de dúvidas por menus (sem IA)",
+      "Termos de uso versionados, com aceite obrigatório da versão vigente e cópia em PDF",
+      "Perfis de acesso, JWT com refresh token, limite de requisições e registro de auditoria das operações",
+    ],
+    stack: [
+      { id: "typescript", note: "API, frontend e pacote compartilhado @pilates/shared." },
+      { id: "nodejs", note: "Node 20 no CI." },
+      { id: "fastify", note: "Fastify 4 com @fastify/jwt, Helmet, CORS e rate limit." },
+      { id: "api-rest", note: "127 rotas em 21 módulos, sob /api/v1." },
+      { id: "zod", note: "Zod 3 na API e Zod 4 nos formulários com React Hook Form." },
+      { id: "prisma", note: "Prisma 5: 32 modelos e 14 migrations." },
+      { id: "mysql", note: "MySQL 8 em container." },
+      { id: "react", note: "React 19 com React Router 7." },
+      { id: "vite", note: "Vite 8." },
+      { id: "tailwind", note: "Tailwind 3 com componentes Radix no estilo shadcn/ui." },
+      { id: "tanstack-query" },
+      { id: "recharts", note: "Gráficos da tela de relatórios." },
+      { id: "mercado-pago", note: "SDK mercadopago 3." },
+      { id: "vitest", note: "56 arquivos de teste na API e 29 no frontend." },
+      { id: "github-actions", note: "CI com MySQL, migrations, seed, testes com cobertura e build." },
+      { id: "docker", note: "Compose com MySQL, API, frontend e Nginx." },
+      { id: "nginx", note: "Proxy reverso: /api/v1 para a API e o restante para o frontend." },
+      { id: "git" },
+      { id: "github", note: "Repositório privado." },
+    ],
+    links: {
+      privateRepo: "O código-fonte não é público.",
+    },
+    shots: [
+      {
+        image: "pilates/agenda",
+        alt: "Agenda semanal do painel administrativo de 12 a 18 de outubro, com aulas de Aparelhos, Mat e Fisioterapia por professor e sala, marcadas como realizada, agendada ou cancelada no feriado de segunda-feira.",
+        caption: "Agenda semanal com o status de cada aula.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/dashboard",
+        alt: "Dashboard da equipe com total de alunos, aulas de hoje, receita do mês, inadimplentes e professores ativos, além das listas de aulas de hoje e de pagamentos recentes.",
+        caption: "Dashboard da equipe.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/presenca",
+        alt: "Janela Registrar Presenças de uma aula de Aparelhos com três alunos, dois marcados como presentes, e o botão Salvar e Finalizar Aula.",
+        caption: "Registro de presença da turma.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/acompanhamento",
+        alt: "Acompanhamento de alunos com os totais em risco de evasão, requer atenção e em dia, e a tabela com última presença, frequência em 30 dias, situação financeira e risco de cada aluno.",
+        caption: "Risco de evasão por frequência e financeiro.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/financeiro",
+        alt: "Lista de mensalidades com aluno, plano, valor, vencimento e status pago ou vencido, com o botão Dar baixa nas mensalidades vencidas.",
+        caption: "Mensalidades e baixa manual.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/alunos",
+        alt: "Lista de alunos fictícios com e-mail, telefone, plano, status ativo e ações por aluno.",
+        caption: "Cadastro de alunos.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/aluno-dashboard",
+        alt: "Início do portal do aluno com boas-vindas, aviso de mensalidade em aberto, resumo de aulas e da situação financeira, ações rápidas e a próxima aula.",
+        caption: "Portal do aluno.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/aluno-financeiro",
+        alt: "Financeiro do portal do aluno com mensalidade atual, próximo vencimento, valor em aberto, total pago e a área Pagar via PIX, que informa a data em que o QR Code fica disponível.",
+        caption: "Financeiro do aluno, com pagamento via PIX.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/aluno-presenca",
+        alt: "Frequência do aluno com aulas realizadas, taxa de presença, calendário de comparecimento de outubro e gráfico de evolução mensal.",
+        caption: "Frequência em calendário.",
+        device: "desktop",
+      },
+      {
+        image: "pilates/aluno-dashboard-mobile",
+        alt: "Portal do aluno no celular com boas-vindas, aviso de mensalidade em aberto e resumo de aulas, com navegação na parte de baixo da tela.",
+        caption: "Portal do aluno no celular.",
+        device: "mobile",
+      },
+      {
+        image: "pilates/aluno-agenda-mobile",
+        alt: "Minhas Aulas no celular com as aulas do dia, horário, professor, sala e status.",
+        caption: "Aulas do dia no celular.",
+        device: "mobile",
+      },
+      {
+        image: "pilates/aluno-presenca-mobile",
+        alt: "Frequência no celular com aulas realizadas, taxa de presença e calendário de comparecimento.",
+        caption: "Frequência no celular.",
+        device: "mobile",
+      },
+    ],
+    imageSource:
+      "Sem demonstração publicada. Capturas feitas em 13/10/2026 com o sistema rodando localmente, em um banco de demonstração separado e com dados fictícios (nomes, CPFs 000.000.001-xx e e-mails @exemplo.test). As telas de login e de termos ficaram de fora porque exibem a marca do estúdio.",
+    captureAddress: "127.0.0.1:5174 · execução local, dados fictícios",
+    notes: [
+      "O repositório é privado e o sistema ainda não tem demonstração pública: o deploy em servidor próprio (VPS) está em preparação.",
+    ],
+    accent: { color: "#d8385e", ink: "#ffffff", text: "#b3264b", surface: "#403e3c", onSurface: "#fbf8ec" },
+    layout: "portals",
+    sheet: {
+      languages: ["TypeScript", "SQL", "CSS", "Shell", "Dockerfile"],
+      architecture: [
+        "Monorepo com backend/ (API Fastify), frontend/ (React + Vite) e packages/shared (schemas Zod usados pela API).",
+        "API em módulos — routes → controller → service → repository — com middlewares de autenticação e de perfil de acesso.",
+        "Eventos internos (aula realizada, presença registrada, pagamento confirmado) disparam notificações, fecham reposições e cancelam cobranças PIX pendentes.",
+        "Tarefas agendadas: aulas encerradas (a cada hora), mensalidades vencidas (a cada 6 h), cobranças PIX expiradas (a cada 5 min) e geração de mensalidades por expressão cron configurável.",
+      ],
+      persistence: "MySQL 8 com Prisma ORM: 32 modelos, 25 enums e 14 migrations.",
+      deploy: "Docker Compose (MySQL, API, frontend e Nginx). Ainda sem publicação; o deploy em VPS está em preparação.",
+      files: [
+        "backend/prisma/schema.prisma",
+        "backend/src/modules/agenda/agenda.service.ts",
+        "backend/src/modules/pagamentos-pix/",
+        "frontend/src/features/aluno/",
+        "docker-compose.yml",
+      ],
+      verification: [
+        "Executado localmente em 13/10/2026 com um banco de demonstração separado, criado pelas migrations e pelo seed do próprio projeto.",
+        "Os dados fictícios foram cadastrados pela API do sistema, com as mesmas validações das telas; só as datas de registro foram ajustadas no banco de demonstração para simular algumas semanas de uso.",
+        "Funcionalidades e números de modelos, rotas e testes conferidos no código-fonte. Como o repositório é privado, a data exibida é a do primeiro commit.",
+      ],
+    },
+  },
+
+  // ------------------------------------------------------------------ 04
+  {
+    slug: "fotos",
+    number: "04",
     name: "RestaurArt",
     repoName: "Fotos",
     kind: "interface",
@@ -545,10 +712,10 @@ export const projects: Project[] = [
     },
   },
 
-  // ------------------------------------------------------------------ 04
+  // ------------------------------------------------------------------ 05
   {
     slug: "iaworkout",
-    number: "04",
+    number: "05",
     name: "IaWorkout",
     repoName: "IaWorkout",
     kind: "sistema",
@@ -687,10 +854,10 @@ export const projects: Project[] = [
     },
   },
 
-  // ------------------------------------------------------------------ 05
+  // ------------------------------------------------------------------ 06
   {
     slug: "cyborg",
-    number: "05",
+    number: "06",
     name: "CyborgGames",
     repoName: "projeto-CyborgGames",
     kind: "interface",
@@ -766,10 +933,10 @@ export const projects: Project[] = [
     },
   },
 
-  // ------------------------------------------------------------------ 06
+  // ------------------------------------------------------------------ 07
   {
     slug: "starbucks",
-    number: "06",
+    number: "07",
     name: "Starbucks — estudo de interface",
     repoName: "AleckDevv-projeto-starbucks.github.io",
     kind: "interface",
@@ -842,10 +1009,10 @@ export const projects: Project[] = [
     },
   },
 
-  // ------------------------------------------------------------------ 07
+  // ------------------------------------------------------------------ 08
   {
     slug: "b7burger",
-    number: "07",
+    number: "08",
     name: "B7 Burger",
     repoName: "AleckDevv-projeto-b7-burger.github.io",
     kind: "interface",
@@ -916,10 +1083,10 @@ export const projects: Project[] = [
     },
   },
 
-  // ------------------------------------------------------------------ 08
+  // ------------------------------------------------------------------ 09
   {
     slug: "agencia",
-    number: "08",
+    number: "09",
     name: "Agência XYZ",
     repoName: "AleckDevv-projeto-agencia.github.io",
     kind: "interface",
@@ -988,10 +1155,10 @@ export const projects: Project[] = [
     },
   },
 
-  // ------------------------------------------------------------------ 09
+  // ------------------------------------------------------------------ 10
   {
     slug: "medcenter",
-    number: "09",
+    number: "10",
     name: "Medicenter",
     repoName: "AleckDevv-projeto-medcenter.github.io",
     kind: "interface",

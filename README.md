@@ -1,6 +1,6 @@
 # Portfólio — Alex Soares Lopes (AleckDevv)
 
-Portfólio pessoal de desenvolvedor full stack com os 9 projetos reais publicados no GitHub. Identidade visual própria (azul elétrico, papel, amarelo ácido, laranja e ciano), tipografia variável que reage ao cursor, composições diferentes para cada projeto, páginas de estudo de caso, modo técnico opcional e nenhuma barra de progresso.
+Portfólio pessoal de desenvolvedor full stack com 10 projetos reais: 9 com repositório público no GitHub e o Sistema Pilates, de repositório privado. Identidade visual própria (azul elétrico, papel, amarelo ácido, laranja e ciano), tipografia variável que reage ao cursor, composições diferentes para cada projeto, páginas de estudo de caso, modo técnico opcional e nenhuma barra de progresso.
 
 ![Prévia do portfólio](public/og/home.png)
 
@@ -36,7 +36,7 @@ npm run preview    # serve dist/ como em produção (http://localhost:4173)
 | Arquivo | O que contém |
 |---|---|
 | `src/content/profile.ts` | Nome, título do hero (linhas e estilos), apresentação, **formação** (vazia por padrão — o bloco só aparece quando preenchida), **objetivos**, e-mail, GitHub e LinkedIn. |
-| `src/content/projects.ts` | Fonte única dos 9 projetos: textos, funcionalidades confirmadas, tecnologias, links, capturas, cores de identidade, composição na home e ficha técnica. |
+| `src/content/projects.ts` | Fonte única dos 10 projetos: textos, funcionalidades confirmadas, tecnologias, links, capturas, cores de identidade, composição na home e ficha técnica. |
 | `src/content/technologies.ts` | Tecnologias por categoria, com explicação e status `pratica` (usada em projetos) ou `estudo` (aprendizado em andamento). Os projetos em que cada uma aparece são calculados a partir de `projects.ts`. |
 | `src/content/site.ts` | Título, descrição e URL pública do site. |
 
@@ -56,6 +56,10 @@ npm run og                   # gera as imagens Open Graph e os ícones
 
 O otimizador publica somente as imagens referenciadas em `projects.ts`. Para usar uma nova captura, coloque o PNG em `assets-src/captures/<slug>/`, referencie o ID (`<slug>/<nome>`) em `projects.ts` e rode `npm run images`.
 
+O Sistema Pilates não tem demo pública: as capturas em `assets-src/captures/pilates/` foram feitas com o sistema rodando localmente, em um banco de demonstração separado e com dados fictícios (detalhes em [docs/verificacao-dos-projetos.md](docs/verificacao-dos-projetos.md)). Por isso ele não entra no `npm run capture`.
+
+Projeto de repositório privado: em `projects.ts`, use `links.privateRepo` (texto do aviso) no lugar de `links.repo`; o site mostra "Repositório privado" em vez do link e omite `codeRepository` no JSON-LD.
+
 ## Testes e validação
 
 ```bash
@@ -69,7 +73,7 @@ npm run check:links   # confere repositórios, demonstrações e contatos (HTTP)
 npm run audit:demos   # mede rolagem horizontal e erros de JS nas demos publicadas
 ```
 
-Resultado da última execução (13/10/2026): lint sem avisos, 20 testes unitários e 73 testes de ponta a ponta aprovados (desktop 1440 px e celular 390 px), auditoria axe sem violações graves (WCAG 2.2 AA), nenhuma rolagem horizontal de 320 a 1920 px e 19 links externos respondendo.
+Resultado da última execução (15/10/2026): lint sem avisos, 21 testes unitários e 77 testes de ponta a ponta aprovados (desktop 1440 px e celular 390 px), auditoria axe sem violações graves (WCAG 2.2 AA), nenhuma rolagem horizontal de 320 a 1920 px e 19 links externos respondendo.
 
 Para revisar visualmente: com `npm run preview` rodando, `node scripts/review-screens.mjs` salva capturas do próprio portfólio em várias larguras.
 
@@ -125,7 +129,7 @@ Alternativa opcional ao deploy na Vercel. O workflow `.github/workflows/deploy-p
 ```
 src/
   content/       dados (perfil, projetos, tecnologias, manifesto de imagens)
-  components/    hero, projetos (9 composições), seções, mídia, layout, ui
+  components/    hero, projetos (10 composições), seções, mídia, layout, ui
   pages/         HomePage, ProjectPage, NotFoundPage
   lib/           preferências, transições, SEO, rolagem, hooks
   styles/        tokens e base (Tailwind 4)

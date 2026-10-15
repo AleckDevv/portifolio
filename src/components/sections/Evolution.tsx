@@ -4,7 +4,8 @@ import { TransitionLink } from "../../lib/transition";
 import { Reveal } from "../ui/Reveal";
 import { SectionHeading } from "../ui/SectionHeading";
 
-// Linha do tempo pelas datas de criação dos repositórios (API do GitHub).
+// Linha do tempo pelas datas de criação dos repositórios (API do GitHub; no
+// repositório privado do Sistema Pilates, a data do primeiro commit).
 const YEARS: Array<{ year: string; title: string; text: string; projects: ProjectSlug[] }> = [
   {
     year: "2024",
@@ -21,8 +22,8 @@ const YEARS: Array<{ year: string; title: string; text: string; projects: Projec
   {
     year: "2026",
     title: "Sistemas completos",
-    text: "React com Tailwind e Framer Motion, controle de estoque com exportação e backup, e um sistema de gestão de frota com 10 módulos integrados.",
-    projects: ["fotos", "conveniencia", "vieira"],
+    text: "React com Tailwind e Framer Motion; um sistema para estúdio de Pilates em TypeScript, com API em Fastify, Prisma e PIX; controle de estoque com exportação e backup; e um sistema de gestão de frota com 10 módulos integrados.",
+    projects: ["fotos", "pilates", "conveniencia", "vieira"],
   },
 ];
 

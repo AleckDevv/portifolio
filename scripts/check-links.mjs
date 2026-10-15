@@ -9,7 +9,8 @@ import { projects } from "../src/content/projects.ts";
 
 const links = [
   ...projects.flatMap((p) => [
-    { label: `${p.number} ${p.name} — repositório`, url: p.links.repo, required: true },
+    // Repositório privado não tem link público para conferir.
+    ...(p.links.repo ? [{ label: `${p.number} ${p.name} — repositório`, url: p.links.repo, required: true }] : []),
     ...(p.links.demo ? [{ label: `${p.number} ${p.name} — demonstração`, url: p.links.demo.url, required: true }] : []),
   ]),
   { label: "Perfil no GitHub", url: profile.contact.github, required: true },

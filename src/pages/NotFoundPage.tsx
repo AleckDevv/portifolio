@@ -1,5 +1,6 @@
 import { useLocation } from "react-router";
 import { Icon } from "../components/ui/Icon";
+import { projects } from "../content/projects";
 import { useMounted } from "../lib/hooks";
 import { TransitionLink } from "../lib/transition";
 import { useSeo } from "../lib/useSeo";
@@ -21,7 +22,7 @@ export function NotFoundPage() {
         <span className="sr-only"> — página não encontrada</span>
       </h1>
       <p className="text-lead mt-8 max-w-xl text-white">
-        Esta rota não compilou. O endereço que você abriu não existe — mas os nove projetos continuam no lugar.
+        Esta rota não compilou. O endereço que você abriu não existe — mas os {projects.length} projetos continuam no lugar.
       </p>
       <div className="mt-10 flex flex-wrap gap-3">
         <TransitionLink to="/" label="Início" className="btn btn-acid">

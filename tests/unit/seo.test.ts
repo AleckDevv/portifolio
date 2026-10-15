@@ -3,7 +3,7 @@ import { projects } from "../../src/content/projects";
 import { renderHead, seoForPath, staticRoutes } from "../../src/lib/seo";
 
 describe("SEO", () => {
-  it("gera rotas estáticas para a home e os 9 projetos", () => {
+  it("gera rotas estáticas para a home e todos os projetos", () => {
     expect(staticRoutes()).toEqual(["/", ...projects.map((p) => `/projetos/${p.slug}`)]);
   });
 
@@ -14,13 +14,14 @@ describe("SEO", () => {
     expect(seo.image).toBe("og/home.png");
   });
 
-  it("descreve cada projeto com canonical, imagem OG e código-fonte", () => {
+  it("descreve cada projeto com canonical, imagem OG e código-fonte (quando público)", () => {
     for (const project of projects) {
       const seo = seoForPath(`/projetos/${project.slug}/`);
       expect(seo.title).toContain(project.name);
       expect(seo.path).toBe(`/projetos/${project.slug}/`);
       expect(seo.image).toBe(`og/${project.slug}.png`);
-      expect(seo.jsonLd?.codeRepository).toBe(project.links.repo);
+      if (project.links.repo) expect(seo.jsonLd?.codeRepository).toBe(project.links.repo);
+      else expect(seo.jsonLd).not.toHaveProperty("codeRepository");
     }
   });
 

@@ -1,6 +1,6 @@
 # Verificação dos projetos
 
-Levantamento feito em **13/10/2026** para que o portfólio descreva cada projeto com informações verdadeiras.
+Levantamento feito em **13/10/2026** para que o portfólio descreva cada projeto com informações verdadeiras. O Sistema Pilates (projeto 03) foi incluído depois, com o mesmo critério.
 
 ## Método
 
@@ -12,6 +12,12 @@ Levantamento feito em **13/10/2026** para que o portfólio descreva cada projeto
   - checagem de erros de JavaScript;
   - capturas de tela usadas no site.
 - **Conveniência THR:** a demo começa vazia, então os produtos e as movimentações das capturas foram cadastrados pela própria interface, apenas no navegador de teste.
+- **Sistema Pilates (repositório privado, sem demo):**
+  - código lido na pasta local do projeto, sem nenhuma alteração;
+  - executado na máquina do autor com um **banco de demonstração separado** (`pilates_portfolio_demo`), criado pelas migrations e pelo seed do próprio projeto — o banco usado no Docker do projeto não foi tocado;
+  - variáveis de ambiente de demonstração, com token falso do Mercado Pago (nenhuma cobrança PIX real é possível) e todo tráfego externo bloqueado durante as capturas;
+  - dados fictícios cadastrados pela API do sistema (nomes inventados, CPFs `000.000.001-xx`, e-mails `@exemplo.test`); só as datas de registro foram ajustadas no banco de demonstração para simular algumas semanas de uso;
+  - telas de login e de termos não capturadas, porque mostram a marca do estúdio.
 
 ## Resumo
 
@@ -19,15 +25,16 @@ Levantamento feito em **13/10/2026** para que o portfólio descreva cada projeto
 |---|---|---|---|---|
 | 01 | Vieira Gestão Operacional | Vercel ✓ | Capturas da demo (10 módulos, tema escuro, celular) | — |
 | 02 | Conveniência THR | Vercel ✓ | Capturas da demo com dados de exemplo | Repositório sem README |
-| 03 | RestaurArt (repo *Fotos*) | Vercel ✓ | Capturas da demo (8 seções) | — |
-| 04 | IaWorkout | **Sem demo pública** | Capturas que já existem no repositório | Ver nota sobre o README |
-| 05 | CyborgGames | GitHub Pages ✓ | Capturas da demo (menu mobile aberto) | Layout de referência TemplateMo |
-| 06 | Starbucks — estudo de interface | GitHub Pages ✓ | Capturas da demo | Projeto educacional, sem vínculo com a marca |
-| 07 | B7 Burger | GitHub Pages ✓ | Capturas da demo | Interface estática |
-| 08 | Agência XYZ | GitHub Pages ✓ (sem CSS) | Capturas do autor incluídas no repositório | **CSS vazio no repositório** |
-| 09 | Medicenter | GitHub Pages ✓ | Capturas da demo | Não é responsivo |
+| 03 | Sistema Pilates (repo privado *Sistema-Pilates*) | **Sem demo pública** | Capturas da execução local com dados fictícios | Repositório privado; ver pontos de atenção |
+| 04 | RestaurArt (repo *Fotos*) | Vercel ✓ | Capturas da demo (8 seções) | — |
+| 05 | IaWorkout | **Sem demo pública** | Capturas que já existem no repositório | Ver nota sobre o README |
+| 06 | CyborgGames | GitHub Pages ✓ | Capturas da demo (menu mobile aberto) | Layout de referência TemplateMo |
+| 07 | Starbucks — estudo de interface | GitHub Pages ✓ | Capturas da demo | Projeto educacional, sem vínculo com a marca |
+| 08 | B7 Burger | GitHub Pages ✓ | Capturas da demo | Interface estática |
+| 09 | Agência XYZ | GitHub Pages ✓ (sem CSS) | Capturas do autor incluídas no repositório | **CSS vazio no repositório** |
+| 10 | Medicenter | GitHub Pages ✓ | Capturas da demo | Não é responsivo |
 
-Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com rolagem horizontal: 08 (+1618 px em 390) e 09 (+217 px em 390). Nenhuma demo apresentou erros de JavaScript.
+Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 04, 06, 07 e 08. Com rolagem horizontal: 09 (+1618 px em 390) e 10 (+217 px em 390). Nenhuma demo apresentou erros de JavaScript.
 
 ## Pontos que pedem sua atenção
 
@@ -50,6 +57,12 @@ Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com ro
    - Se preferir não divulgá-lo, remova `links.demo` do projeto 01 em `src/content/projects.ts`.
 6. **E-mail de contato:** usei `alexsoareslopes688@gmail.com`, que aparece no README do B7 Burger. O README do seu perfil traz um modelo não preenchido (`SEU-EMAIL-AQUI`). Confirme em `src/content/profile.ts`.
 7. **Formação:** não encontrei informação verificável e não inventei nada. Preencha `education` em `src/content/profile.ts` para o bloco aparecer em "Sobre".
+8. **Sistema Pilates — encontrados ao rodar o sistema (nada foi alterado no projeto):**
+   - **Registrar Presenças não carrega o que já foi salvo.** O modal (`PresencaModal.tsx`) começa sempre com todos desmarcados, inclusive em aulas já realizadas. Reabrir uma aula realizada e clicar em "Salvar e Finalizar Aula" grava todos como ausentes, sobrescrevendo as presenças anteriores.
+   - **`GET /api/v1/usuarios` devolve o campo `senhaHash`** de cada usuário. Mesmo sendo bcrypt e restrito a administradores, o hash não deveria sair da API.
+   - **Planos do seed com id não-UUID** (`plano-mensal`, `plano-trimestral`): o cadastro de aluno valida `planoId` como UUID e recusa esses planos. Só afeta o ambiente de desenvolvimento.
+   - O card "Receita do Mês" do dashboard soma apenas os 5 pagamentos mais recentes, e não o mês inteiro.
+   - Se você tiver autorização do estúdio para mostrar a marca, as telas de login podem ser capturadas e incluídas.
 
 ## Detalhes por projeto
 
@@ -73,7 +86,20 @@ Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com ro
   - Backup e restauração em JSON com validação.
   - LocalStorage com migração de chaves antigas.
 
-### 03 — RestaurArt (`Fotos`)
+### 03 — Sistema Pilates (`Sistema-Pilates`, privado)
+
+- **Confirmado no código:**
+  - **Back-end:** Node 20, Fastify 4 (`@fastify/jwt` com refresh token, Helmet, CORS, rate limit), Prisma 5 com MySQL 8 (32 modelos, 25 enums, 14 migrations), Zod no pacote `@pilates/shared`, ExcelJS, Pino, `node-cron` e SDK `mercadopago` 3.
+  - **API:** 127 rotas em 21 módulos (`routes → controller → service → repository`), perfis ADMIN, PROFESSOR, RECEPCIONISTA e FINANCEIRO, além do portal do aluno.
+  - **Front-end:** React 19, Vite 8, TypeScript, Tailwind 3 com componentes Radix (estilo shadcn/ui), React Router 7, TanStack Query, React Hook Form + Zod, Recharts (relatórios) e jsPDF (PDF do termo).
+  - **Regras:** conflito de horário do professor, capacidade da aula, lançamento em lote, justificativa obrigatória para cancelar/suspender/excluir, mensalidade seguinte gerada após a quitação, webhook do PIX com assinatura HMAC, risco de evasão (30 dias de frequência + situação financeira).
+  - **Tarefas agendadas:** aulas encerradas (1 h), mensalidades vencidas (6 h), cobranças PIX expiradas (5 min) e geração de mensalidades por cron configurável.
+  - **Qualidade:** 56 arquivos de teste na API e 29 no frontend (Vitest); CI no GitHub Actions com MySQL, migrations, seed, testes com cobertura e build.
+  - **Infraestrutura:** Docker Compose com MySQL, API, frontend e Nginx (proxy de `/api/v1`). O workflow de deploy ainda é um modelo manual, e o README marca o deploy em VPS como "em construção".
+- **Data:** primeiro commit em 26/05/2026 (repositório privado, sem acesso à API do GitHub).
+- **Imagens:** 12 capturas (9 no computador, 3 no celular) da execução local com dados fictícios.
+
+### 04 — RestaurArt (`Fotos`)
 
 - **Confirmado:** landing page de um serviço de restauração de fotos.
   - **Tecnologia:** React 19, Vite 8, Tailwind 3, Framer Motion e Lucide.
@@ -84,7 +110,7 @@ Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com ro
     - rodapé com Instagram, WhatsApp e e-mail.
 - **Limite da descrição:** o site apresenta o serviço; a restauração em si não é feita pela página, e o portfólio não diz que é.
 
-### 04 — IaWorkout (`IaWorkout`)
+### 05 — IaWorkout (`IaWorkout`)
 
 - **Confirmado no código:**
   - **Back-end:** Java 17, Spring Boot 3.3 (Web, Data JPA, Security, Validation, AOP), JWT (`java-jwt`), MySQL 8, Flyway (22 migrations), Maven, Apache POI (importação de alunos por `.xlsx`).
@@ -97,7 +123,7 @@ Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com ro
 - **Sem demonstração pública:** nenhum registro de deploy no GitHub. Os endereços prováveis na Vercel, com o sufixo da sua equipe, retornam 404.
 - **Imagens:** capturas existentes em `landing-page/src/assets/`.
 
-### 05 — CyborgGames (`projeto-CyborgGames`)
+### 06 — CyborgGames (`projeto-CyborgGames`)
 
 - **Confirmado:**
   - HTML e CSS com variáveis em `:root`.
@@ -106,7 +132,7 @@ Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com ro
   - Cards com hover e seção de biblioteca.
   - O rodapé credita o design à TemplateMo (Cyborg Gaming).
 
-### 06 — Starbucks (`AleckDevv-projeto-starbucks.github.io`)
+### 07 — Starbucks (`AleckDevv-projeto-starbucks.github.io`)
 
 - **Confirmado:**
   - HTML e CSS com três media queries.
@@ -116,7 +142,7 @@ Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com ro
   - README declara fins educacionais.
 - **No site:** o selo "Projeto educacional · sem vínculo com a marca" aparece junto do título.
 
-### 07 — B7 Burger (`AleckDevv-projeto-b7-burger.github.io`)
+### 08 — B7 Burger (`AleckDevv-projeto-b7-burger.github.io`)
 
 - **Confirmado:**
   - HTML e CSS, sem JavaScript.
@@ -125,12 +151,12 @@ Sem rolagem horizontal em 390 e 768 px: projetos 01, 02, 03, 05, 06 e 07. Com ro
   - O ícone de menu mobile é decorativo.
   - O arquivo `.fig` (Figma) está no repositório; o rodapé credita a B7Web.
 
-### 08 — Agência XYZ (`AleckDevv-projeto-agencia.github.io`)
+### 09 — Agência XYZ (`AleckDevv-projeto-agencia.github.io`)
 
 - **Confirmado:** estrutura HTML de site institucional com início, sobre, serviços (ícones Font Awesome), portfólio em grade e formulário de contato.
 - **Pendente:** a camada de estilos não está no repositório (ver "Pontos que pedem sua atenção").
 
-### 09 — Medicenter (`AleckDevv-projeto-medcenter.github.io`)
+### 10 — Medicenter (`AleckDevv-projeto-medcenter.github.io`)
 
 - **Confirmado:**
   - Recriação, para estudo, do template MediCenter da QuanticaLabs, com crédito no rodapé.

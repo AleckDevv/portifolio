@@ -8,7 +8,9 @@ import { technologies, type TechId } from "../../src/content/technologies";
 
 const ROOT = path.resolve(__dirname, "../..");
 
-// Os 9 repositórios exigidos no briefing — nenhum pode faltar.
+// Os 9 repositórios públicos exigidos no briefing — nenhum pode faltar.
+// O Sistema Pilates, adicionado depois, tem repositório privado (sem link).
+const PRIVATE_REPO_PROJECTS = ["pilates"];
 const REQUIRED_REPOS = [
   "https://github.com/AleckDevv/sistema_prototipo_vieira",
   "https://github.com/AleckDevv/convenienciaTHR",
@@ -25,6 +27,7 @@ const REQUIRED_REPOS = [
 const VERIFIED_DEMOS: Record<string, string | undefined> = {
   vieira: "https://sistemaprototipovieira.vercel.app/",
   conveniencia: "https://conveniencia-zeta.vercel.app/",
+  pilates: undefined,
   fotos: "https://fotosrestaurar.vercel.app/",
   iaworkout: undefined,
   cyborg: "https://aleckdevv.github.io/projeto-CyborgGames/",
@@ -48,14 +51,17 @@ function contrast(a: string, b: string): number {
 }
 
 describe("projetos", () => {
-  it("contém exatamente os 9 repositórios exigidos, sem duplicatas", () => {
-    expect(projects).toHaveLength(9);
-    expect(projects.map((p) => p.links.repo).sort()).toEqual([...REQUIRED_REPOS].sort());
-    expect(new Set(projects.map((p) => p.slug)).size).toBe(9);
+  it("contém os 9 repositórios públicos exigidos e o projeto de repositório privado, sem duplicatas", () => {
+    expect(projects).toHaveLength(10);
+    expect(projects.flatMap((p) => (p.links.repo ? [p.links.repo] : [])).sort()).toEqual([...REQUIRED_REPOS].sort());
+    expect(projects.filter((p) => !p.links.repo).map((p) => p.slug)).toEqual(PRIVATE_REPO_PROJECTS);
+    expect(new Set(projects.map((p) => p.slug)).size).toBe(10);
   });
 
-  it("numera os projetos de 01 a 09 na ordem do briefing", () => {
-    expect(projects.map((p) => p.number)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08", "09"]);
+  it("numera os projetos de 01 a 10, do mais recente ao mais antigo", () => {
+    expect(projects.map((p) => p.number)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]);
+    const dates = projects.map((p) => p.createdAt);
+    expect(dates).toEqual([...dates].sort().reverse());
   });
 
   it("usa somente as demonstrações verificadas (sem URLs inventadas)", () => {
@@ -66,7 +72,8 @@ describe("projetos", () => {
 
   it("tem conteúdo completo em cada projeto", () => {
     for (const project of projects) {
-      expect(project.repoName, project.slug).toBe(project.links.repo.split("/").pop());
+      if (project.links.repo) expect(project.repoName, project.slug).toBe(project.links.repo.split("/").pop());
+      else expect(project.links.privateRepo?.length, project.slug).toBeGreaterThan(10);
       expect(project.summary.length, project.slug).toBeGreaterThan(0);
       expect(project.features.length, project.slug).toBeGreaterThanOrEqual(4);
       expect(project.stack.length, project.slug).toBeGreaterThanOrEqual(3);
@@ -107,6 +114,14 @@ describe("projetos", () => {
     expect(text(b7)).toContain("não há sistema de pedidos");
     expect(text(med)).toContain("não há agendamento");
     expect(text(med)).not.toMatch(/responsiv/);
+  });
+
+  it("deixa claro que as capturas do projeto privado usam dados fictícios e execução local", () => {
+    for (const project of projects.filter((p) => !p.links.repo)) {
+      expect(project.links.demo, project.slug).toBeUndefined();
+      expect(project.imageSource, project.slug).toMatch(/dados fictícios/);
+      expect(project.captureAddress, project.slug).toMatch(/execução local/);
+    }
   });
 });
 

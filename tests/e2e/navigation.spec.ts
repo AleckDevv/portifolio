@@ -33,11 +33,15 @@ test.describe("navegação", () => {
       expect(html).toContain(`<title>${project.name.replace(/"/g, "&quot;")}`);
       expect(html).toContain(`og/${project.slug}.png`);
       expect(html).toContain(`rel="canonical"`);
-      expect(html).toContain(project.links.repo);
+      expect(html).toContain(project.links.repo ?? "Repositório privado");
 
       await page.goto(`/projetos/${project.slug}/`);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(project.name);
-      await expect(page.getByRole("link", { name: /Repositório/ }).first()).toHaveAttribute("href", project.links.repo);
+      if (project.links.repo) {
+        await expect(page.getByRole("link", { name: /Repositório/ }).first()).toHaveAttribute("href", project.links.repo);
+      } else {
+        await expect(page.getByRole("link", { name: /Repositório/ })).toHaveCount(0);
+      }
     });
   }
 

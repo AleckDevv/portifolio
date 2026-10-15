@@ -49,16 +49,16 @@ export const profile: Profile = {
   ],
 
   intro:
-    "Sou Alex Soares Lopes, o AleckDevv. Construo sistemas de gestão, interfaces web e APIs — do banco de dados à última tela — com Java, Spring Boot, React e SQL.",
+    "Sou Alex Soares Lopes, o AleckDevv. Construo sistemas de gestão, interfaces web e APIs — do banco de dados à última tela — com Java, Spring Boot, TypeScript, React e SQL.",
 
   about: {
     lead: "Comecei recriando interfaces em HTML e CSS. Hoje desenho regras de negócio, modelo bancos de dados e entrego sistemas completos.",
     paragraphs: [
-      "Gosto de pegar um processo confuso — uma frota, um estoque, a rotina de uma academia — e transformá-lo em telas claras, regras consistentes e dados confiáveis. Meus projetos mais recentes cobrem esse caminho inteiro: API em Spring Boot com MySQL, painéis em React e protótipos que rodam direto no navegador.",
+      "Gosto de pegar um processo confuso — uma frota, um estoque, a agenda de um estúdio, a rotina de uma academia — e transformá-lo em telas claras, regras consistentes e dados confiáveis. Meus projetos mais recentes cobrem esse caminho inteiro: APIs em Spring Boot e em Fastify com MySQL, painéis em React e protótipos que rodam direto no navegador.",
       "Fora do código, a inspiração vem de jogos, de música e dos momentos com o violão e a guitarra.",
     ],
     focus: [
-      "Desenvolvimento full stack com Java e React",
+      "Desenvolvimento full stack com Java, TypeScript e React",
       "Sistemas de gestão e regras de negócio",
       "Interfaces web responsivas e acessíveis",
       "Resolução de problemas com software",
@@ -72,7 +72,7 @@ export const profile: Profile = {
   // Objetivos profissionais (edite livremente).
   goals: [
     "Atuar como desenvolvedor full stack em equipes que constroem sistemas usados no dia a dia.",
-    "Aprofundar a arquitetura de back-end com Java e Spring e levar o TypeScript para os próximos projetos.",
+    "Aprofundar a arquitetura de back-end, com Java e Spring e com Node.js e TypeScript.",
   ],
 
   contact: {

@@ -1,6 +1,7 @@
 import { projectsUsing } from "../../content/projects";
-import { categories, technologies, type TechCategory, type TechId } from "../../content/technologies";
+import { categories, technologies, type TechCategory, type TechId, type Technology } from "../../content/technologies";
 import { useTechDialog } from "../stack/tech-dialog-context";
+import { Breakable } from "../ui/Breakable";
 import { Reveal } from "../ui/Reveal";
 import { SectionHeading } from "../ui/SectionHeading";
 
@@ -8,7 +9,7 @@ const ORDER: TechCategory[] = ["frontend", "backend", "dados", "ferramentas", "i
 
 function TechTile({ id }: { id: TechId }) {
   const { openTech } = useTechDialog();
-  const tech = technologies[id];
+  const tech: Technology = technologies[id];
   const count = projectsUsing(id).length;
   const studying = tech.status === "estudo";
   return (
@@ -29,7 +30,7 @@ function TechTile({ id }: { id: TechId }) {
         <span className="label pt-0.5 opacity-75">{studying ? "estudo" : count}</span>
       </span>
       <span className="text-[0.92rem] leading-tight font-semibold">
-        {tech.name}
+        <Breakable text={tech.name} />
         <span className="sr-only">
           {studying ? " — em estudo" : ` — usado em ${count} ${count === 1 ? "projeto" : "projetos"}`}. Ver detalhes.
         </span>
@@ -40,6 +41,8 @@ function TechTile({ id }: { id: TechId }) {
 
 export function StackSection() {
   const ids = Object.keys(technologies) as TechId[];
+  // A legenda de "estudo" só aparece quando alguma tecnologia está nesse status.
+  const hasStudying = ids.some((id) => (technologies[id] as Technology).status === "estudo");
   return (
     <section
       id="stack"
@@ -58,9 +61,11 @@ export function StackSection() {
             <li className="flex items-center gap-2">
               <span aria-hidden="true" className="inline-block h-3.5 w-3.5 border-2 border-ink bg-white" /> usada em projetos (nº de projetos)
             </li>
-            <li className="flex items-center gap-2">
-              <span aria-hidden="true" className="inline-block h-3.5 w-3.5 border-2 border-dashed border-ink" /> aprendizado em andamento
-            </li>
+            {hasStudying && (
+              <li className="flex items-center gap-2">
+                <span aria-hidden="true" className="inline-block h-3.5 w-3.5 border-2 border-dashed border-ink" /> aprendizado em andamento
+              </li>
+            )}
           </ul>
         </div>
       </SectionHeading>

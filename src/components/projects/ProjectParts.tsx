@@ -4,6 +4,7 @@ import { getTech, type TechId } from "../../content/technologies";
 import { monthYear, shortDate, year } from "../../lib/format";
 import { TransitionLink } from "../../lib/transition";
 import { useTechDialog } from "../stack/tech-dialog-context";
+import { Breakable } from "../ui/Breakable";
 import { Icon } from "../ui/Icon";
 import { kindLabel } from "./project-utils";
 
@@ -33,24 +34,13 @@ const TITLE_SIZES = {
   md: "text-[clamp(2.1rem,3.8vw,4rem)] leading-[0.92]",
 } as const;
 
-/** Insere pontos de quebra opcionais em nomes camelCase ("CyborgGames" → "Cyborg<wbr>Games"). */
-function breakable(name: string) {
-  const parts = name.split(/(?<=[a-z])(?=[A-Z])/);
-  return parts.map((part, index) => (
-    <span key={part + index}>
-      {index > 0 && <wbr />}
-      {part}
-    </span>
-  ));
-}
-
 export function ProjectTitle({ project, as: Tag = "h3", size = "xl", className }: ProjectTitleProps) {
   return (
     <Tag
       id={`${project.slug}-title`}
       className={`${TITLE_SIZES[size]} font-[850] tracking-tight break-words uppercase ${className ?? ""}`}
     >
-      {breakable(project.name)}
+      <Breakable text={project.name} />
     </Tag>
   );
 }
@@ -110,10 +100,14 @@ export function ProjectLinks({ project, showCaseStudy = true, className, tone = 
             Estudo de caso <Icon name="arrow" />
           </TransitionLink>
         )}
-        <a href={project.links.repo} target="_blank" rel="noreferrer" className="arrow-link">
-          Repositório <Icon name="arrow-ne" className="arrow arrow-ne" />
-          <span className="sr-only">no GitHub (abre em nova aba)</span>
-        </a>
+        {project.links.repo ? (
+          <a href={project.links.repo} target="_blank" rel="noreferrer" className="arrow-link">
+            Repositório <Icon name="arrow-ne" className="arrow arrow-ne" />
+            <span className="sr-only">no GitHub (abre em nova aba)</span>
+          </a>
+        ) : (
+          <span className="label opacity-80">Repositório privado</span>
+        )}
         {project.links.demo ? (
           <a href={project.links.demo.url} target="_blank" rel="noreferrer" className="arrow-link">
             Demonstração <Icon name="arrow-ne" className="arrow arrow-ne" />
@@ -124,6 +118,7 @@ export function ProjectLinks({ project, showCaseStudy = true, className, tone = 
         )}
       </div>
       {project.links.demo?.note && <p className="mt-3 text-sm opacity-80">{project.links.demo.note}</p>}
+      {project.links.privateRepo && <p className="mt-3 text-sm opacity-80">{project.links.privateRepo}</p>}
     </div>
   );
 }
@@ -133,9 +128,12 @@ export function TechSheetCompact({ project, className }: { project: Project; cla
   return (
     <div className={`tech-only ${className ?? ""}`}>
       <dl className="grid gap-x-6 gap-y-3 rounded-xl border border-dashed border-cyan bg-ink p-4 font-mono text-[0.72rem] leading-relaxed text-paper sm:grid-cols-2">
-        <SheetItem label="repo">{project.repoName}</SheetItem>
-        <SheetItem label="criado em">{shortDate(project.createdAt)}</SheetItem>
-        <SheetItem label="linguagens (GitHub)">{project.sheet.languages.join(" · ")}</SheetItem>
+        <SheetItem label="repo">
+          {project.repoName}
+          {project.links.privateRepo && " (privado)"}
+        </SheetItem>
+        <SheetItem label={project.links.repo ? "criado em" : "primeiro commit"}>{shortDate(project.createdAt)}</SheetItem>
+        <SheetItem label={project.links.repo ? "linguagens (GitHub)" : "linguagens"}>{project.sheet.languages.join(" · ")}</SheetItem>
         <SheetItem label="deploy">{project.sheet.deploy}</SheetItem>
         <SheetItem label="persistência" wide>
           {project.sheet.persistence}
@@ -162,11 +160,13 @@ export function TechSheetFull({ project }: { project: Project }) {
   return (
     <dl className="grid gap-8 md:grid-cols-2">
       <div>
-        <dt className="label mb-2 text-ink-soft">Linguagens detectadas pelo GitHub</dt>
+        <dt className="label mb-2 text-ink-soft">
+          {project.links.repo ? "Linguagens detectadas pelo GitHub" : "Linguagens do código-fonte"}
+        </dt>
         <dd className="font-semibold">{sheet.languages.join(" · ")}</dd>
       </div>
       <div>
-        <dt className="label mb-2 text-ink-soft">Repositório criado em</dt>
+        <dt className="label mb-2 text-ink-soft">{project.links.repo ? "Repositório criado em" : "Primeiro commit em"}</dt>
         <dd className="font-semibold">
           {shortDate(project.createdAt)} <span className="text-ink-soft">({monthYear(project.createdAt)})</span>
         </dd>

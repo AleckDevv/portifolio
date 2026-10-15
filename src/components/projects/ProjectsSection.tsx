@@ -100,7 +100,7 @@ export function ProjectsSection() {
           }
         >
           <p className="text-lead max-w-xl lg:col-span-5">
-            Nove projetos reais, das primeiras páginas em HTML e CSS a sistemas completos com Java, React e banco de dados. Cada um tem
+            {projects.length} projetos reais, das primeiras páginas em HTML e CSS a sistemas completos com Java, TypeScript, React e banco de dados. Cada um tem
             uma composição própria e um estudo de caso com telas, tecnologias e detalhes técnicos.
           </p>
           <div className="lg:col-span-6 lg:col-start-7">

@@ -146,7 +146,88 @@ function StackSpread({ project }: { project: Project }) {
   );
 }
 
-// 03 — RestaurArt: película com as seções reais da página --------------------
+// 03 — Sistema Pilates: um sistema, dois lados (equipe e aluno) ---------------
+const PILATES_ROLES = ["Administração", "Professor", "Recepção", "Financeiro"];
+
+function PortalsSpread({ project }: { project: Project }) {
+  const agenda = shot(project, "pilates/agenda");
+  const details = [shot(project, "pilates/presenca"), shot(project, "pilates/acompanhamento")];
+  const phones = [shot(project, "pilates/aluno-dashboard-mobile"), shot(project, "pilates/aluno-presenca-mobile")];
+  // Moldura escura para o painel: barra de endereço legível sobre a superfície do projeto.
+  const frame = "[--frame-line:#6b6764] [--frame-bar:#2b2a29]";
+  return (
+    <Shell project={project}>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end">
+        <Heading project={project} className="lg:col-span-7" />
+        <p className="text-lead lg:col-span-5">{project.tagline}</p>
+      </div>
+
+      <Reveal className="mt-12 grid grid-cols-1 gap-12 rounded-[1.75rem] bg-(--accent-surface) p-5 text-(--accent-on) [--accent-text:#ff8fa8] [--focus:var(--color-acid)] sm:p-8 lg:grid-cols-12 lg:gap-10 lg:p-10">
+        <section aria-labelledby="pilates-equipe" className="min-w-0 lg:col-span-8">
+          <p className="label text-(--accent-text)">Lado 1 · /admin</p>
+          <h4 id="pilates-equipe" className="mt-2 text-title leading-none font-extrabold uppercase">
+            Painel da equipe
+          </h4>
+          <ul aria-label="Perfis de acesso da equipe" className="mt-4 flex flex-wrap gap-2">
+            {PILATES_ROLES.map((role) => (
+              <li key={role} className="chip">
+                {role}
+              </li>
+            ))}
+          </ul>
+          <ShotView
+            shot={agenda}
+            address={shotAddress(project, agenda)}
+            sizes="(min-width: 1024px) 56vw, 100vw"
+            className="mt-8"
+            frameClassName={frame}
+          />
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {details.map((item) => (
+              <ShotView
+                key={item.image}
+                shot={item}
+                address={shotAddress(project, item)}
+                sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 100vw"
+                frameClassName={frame}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section aria-labelledby="pilates-aluno" className="min-w-0 lg:col-span-4 lg:border-l lg:border-white/15 lg:pl-10">
+          <p className="label text-(--accent-text)">Lado 2 · /aluno</p>
+          <h4 id="pilates-aluno" className="mt-2 text-title leading-none font-extrabold uppercase">
+            Portal do aluno
+          </h4>
+          <p className="mt-4">Aulas, frequência, financeiro com PIX, avaliações e notificações — no celular ou no computador.</p>
+          <div className="mt-8 grid max-w-md grid-cols-2 items-start gap-4">
+            {phones.map((item, index) => (
+              <figure key={item.image} className={index === 1 ? "mt-16" : ""}>
+                <PhoneFrame>
+                  <Picture id={item.image} alt={item.alt} sizes="(min-width: 1024px) 12vw, 42vw" />
+                </PhoneFrame>
+                <figcaption className="label mt-3 opacity-80">{item.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        <div className="space-y-2 lg:col-span-12">
+          {project.notes?.map((note) => (
+            <p key={note} className="text-sm">
+              {note}
+            </p>
+          ))}
+          <p className="label opacity-80">{project.imageSource}</p>
+        </div>
+      </Reveal>
+      <Facts project={project} features={6} />
+    </Shell>
+  );
+}
+
+// 04 — RestaurArt: película com as seções reais da página --------------------
 function FilmstripSpread({ project }: { project: Project }) {
   const rail = useRef<HTMLDivElement>(null);
   const { reduceMotion } = usePrefs();
@@ -207,7 +288,7 @@ function FilmstripSpread({ project }: { project: Project }) {
   );
 }
 
-// 04 — IaWorkout: fluxo da IA + painel de telas -----------------------------
+// 05 — IaWorkout: fluxo da IA + painel de telas -----------------------------
 function PipelineSpread({ project }: { project: Project }) {
   const wide = [shot(project, "iaworkout/dashboard-indicadores"), shot(project, "iaworkout/fichas-ia")];
   const phones = [shot(project, "iaworkout/treino-mobile"), shot(project, "iaworkout/portal-aluno-mobile"), shot(project, "iaworkout/assistente-mobile")];
@@ -256,7 +337,7 @@ function PipelineSpread({ project }: { project: Project }) {
   );
 }
 
-// 05 — CyborgGames: moldura de HUD de jogo ------------------------------------
+// 06 — CyborgGames: moldura de HUD de jogo ------------------------------------
 function HudSpread({ project }: { project: Project }) {
   const desktop = shot(project, "cyborg/desktop");
   const menu = shot(project, "cyborg/mobile-menu");
@@ -302,7 +383,7 @@ function HudSpread({ project }: { project: Project }) {
   );
 }
 
-// 06 — Starbucks: composição de revista, com selo de projeto educacional -----
+// 07 — Starbucks: composição de revista, com selo de projeto educacional -----
 function MagazineSpread({ project }: { project: Project }) {
   const desktop = shot(project, "starbucks/desktop");
   return (
@@ -356,7 +437,7 @@ function MagazineSpread({ project }: { project: Project }) {
   );
 }
 
-// 07 — B7 Burger: placa laranja (a cor da própria interface) -----------------
+// 08 — B7 Burger: placa laranja (a cor da própria interface) -----------------
 function PlateSpread({ project }: { project: Project }) {
   const desktop = shot(project, "b7burger/desktop");
   const mobile = shot(project, "b7burger/mobile");
@@ -395,7 +476,7 @@ function PlateSpread({ project }: { project: Project }) {
   );
 }
 
-// 08 — Agência XYZ: tríptico com as capturas do autor ------------------------
+// 09 — Agência XYZ: tríptico com as capturas do autor ------------------------
 function TriptychSpread({ project }: { project: Project }) {
   return (
     <Shell project={project}>
@@ -419,7 +500,7 @@ function TriptychSpread({ project }: { project: Project }) {
   );
 }
 
-// 09 — Medicenter: navegador com a página inteira rolando --------------------
+// 10 — Medicenter: navegador com a página inteira rolando --------------------
 function BrowserSpread({ project }: { project: Project }) {
   return (
     <Shell project={project}>
@@ -457,6 +538,7 @@ function BrowserSpread({ project }: { project: Project }) {
 const LAYOUTS: Record<Project["layout"], (props: { project: Project }) => ReactNode> = {
   modules: ModulesSpread,
   stack: StackSpread,
+  portals: PortalsSpread,
   filmstrip: FilmstripSpread,
   pipeline: PipelineSpread,
   hud: HudSpread,

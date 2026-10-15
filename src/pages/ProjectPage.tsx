@@ -128,7 +128,7 @@ export function ProjectPage() {
               <dd className="mt-1 font-semibold">{kindLabel(project)}</dd>
             </div>
             <div>
-              <dt className="label opacity-80">Repositório criado</dt>
+              <dt className="label opacity-80">{project.links.repo ? "Repositório criado" : "Primeiro commit"}</dt>
               <dd className="mt-1 font-semibold">{monthYearLong(project.createdAt)}</dd>
             </div>
             <div className="col-span-2">
@@ -163,7 +163,9 @@ export function ProjectPage() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7">
             <h2 className="text-title font-[850] uppercase md:wide">Funcionalidades</h2>
-            <p className="label mt-2 text-ink-soft">Confirmadas no código e na demonstração</p>
+            <p className="label mt-2 text-ink-soft">
+              {project.links.demo ? "Confirmadas no código e na demonstração" : project.captureAddress ? "Confirmadas no código e na execução local" : "Confirmadas no código-fonte"}
+            </p>
             <FeatureList project={project} className="mt-6" />
           </div>
         </div>

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { scrollThrough } from "./helpers";
 
 // Auditoria automática de acessibilidade (WCAG 2.2 A/AA) com axe-core.
-for (const path of ["/", "/projetos/vieira", "/projetos/iaworkout", "/projetos/fotos", "/rota-que-nao-existe"]) {
+for (const path of ["/", "/projetos/vieira", "/projetos/pilates", "/projetos/iaworkout", "/projetos/fotos", "/rota-que-nao-existe"]) {
   test(`acessibilidade: ${path}`, async ({ page }) => {
     await page.goto(path);
     await scrollThrough(page);

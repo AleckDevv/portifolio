@@ -7,18 +7,23 @@ test.describe("página inicial", () => {
     const errors = trackErrors(page);
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1, name: "Problemas entram. Software sai." })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Ver os 9 projetos/ })).toHaveAttribute("href", "#projetos");
+    await expect(page.getByRole("link", { name: new RegExp(`Ver os ${projects.length} projetos`) })).toHaveAttribute("href", "#projetos");
     await expect(page.getByRole("link", { name: /Falar comigo/ })).toHaveAttribute("href", "#contato");
     expect(errors).toEqual([]);
   });
 
-  test("mostra os 9 projetos com repositório e demonstração corretos", async ({ page }) => {
+  test("mostra todos os projetos com repositório e demonstração corretos", async ({ page }) => {
     await page.goto("/");
     for (const project of projects) {
       const article = page.locator(`article#${project.slug}`);
       await expect(article, project.slug).toHaveCount(1);
       await expect(article.getByRole("heading", { level: 3 }).first()).toContainText(project.name.split(" ")[0]!, { ignoreCase: true });
-      await expect(article.getByRole("link", { name: /Repositório/ })).toHaveAttribute("href", project.links.repo);
+      if (project.links.repo) {
+        await expect(article.getByRole("link", { name: /Repositório/ })).toHaveAttribute("href", project.links.repo);
+      } else {
+        await expect(article.getByRole("link", { name: /Repositório/ })).toHaveCount(0);
+        await expect(article.getByText("Repositório privado", { exact: true })).toBeVisible();
+      }
       if (project.links.demo) {
         await expect(article.getByRole("link", { name: /Demonstração/ })).toHaveAttribute("href", project.links.demo.url);
       } else {
@@ -49,22 +54,25 @@ test.describe("página inicial", () => {
 
   test("abre a explicação de uma tecnologia com os projetos onde ela aparece", async ({ page }) => {
     await page.goto("/#stack");
-    const tile = page.locator("#stack").getByRole("button", { name: /React — usado em 3 projetos/ });
+    const tile = page.locator("#stack").getByRole("button", { name: /React — usado em 4 projetos/ });
     await tile.click();
     const dialog = page.getByRole("dialog", { name: "React" });
     await expect(dialog).toBeVisible();
-    await expect(dialog).toContainText("Usado em 3 projetos");
-    for (const name of ["Conveniência THR", "RestaurArt", "IaWorkout"]) await expect(dialog.getByRole("link", { name: new RegExp(name) })).toBeVisible();
+    await expect(dialog).toContainText("Usado em 4 projetos");
+    for (const name of ["Conveniência THR", "Sistema Pilates", "RestaurArt", "IaWorkout"]) {
+      await expect(dialog.getByRole("link", { name: new RegExp(name) })).toBeVisible();
+    }
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await expect(tile).toBeFocused();
   });
 
-  test("diferencia tecnologia em estudo", async ({ page }) => {
+  test("mostra o TypeScript como prática, com o projeto em que aparece", async ({ page }) => {
     await page.goto("/#stack");
-    await page.locator("#stack").getByRole("button", { name: /TypeScript/ }).click();
+    await page.locator("#stack").getByRole("button", { name: /TypeScript — usado em 1 projeto/ }).click();
     const dialog = page.getByRole("dialog", { name: "TypeScript" });
-    await expect(dialog).toContainText("Aprendizado em andamento");
+    await expect(dialog).toContainText("Usado em 1 projeto");
+    await expect(dialog.getByRole("link", { name: /Sistema Pilates/ })).toBeVisible();
     await page.getByRole("button", { name: "Fechar" }).click();
     await expect(dialog).toBeHidden();
   });

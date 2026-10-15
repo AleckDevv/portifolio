@@ -1,8 +1,8 @@
 // ============================================================================
 //  TECNOLOGIAS — sem escalas, porcentagens ou medidores.
 //  Cada tecnologia tem uma explicação curta e um status:
-//    "pratica" → usada em projetos publicados (o site lista onde, a partir de projects.ts)
-//    "estudo"  → aprendizado em andamento, ainda sem projeto publicado
+//    "pratica" → usada nos projetos do portfólio (o site lista onde, a partir de projects.ts)
+//    "estudo"  → aprendizado em andamento, ainda sem projeto no portfólio
 // ============================================================================
 
 export type TechCategory = "frontend" | "backend" | "dados" | "ferramentas" | "integracoes";
@@ -65,7 +65,7 @@ export const technologies = {
     category: "frontend",
     status: "pratica",
     description:
-      "Estilização utilitária com tema estendido (cor “gold” e fontes próprias) na landing page RestaurArt.",
+      "Estilização utilitária com tema estendido: cor “gold” e fontes próprias na RestaurArt e a paleta da interface em variáveis CSS no Sistema Pilates.",
   },
   vite: {
     name: "Vite",
@@ -86,7 +86,23 @@ export const technologies = {
     symbol: "Rc",
     category: "frontend",
     status: "pratica",
-    description: "Gráficos de fluxo de caixa e de evolução corporal nos painéis do IaWorkout.",
+    description: "Gráficos de fluxo de caixa e de evolução corporal no IaWorkout e gráficos dos relatórios do Sistema Pilates.",
+  },
+  "tanstack-query": {
+    name: "TanStack Query",
+    symbol: "Tq",
+    category: "frontend",
+    status: "pratica",
+    description:
+      "Cache e sincronização das chamadas à API no Sistema Pilates: listas, indicadores e telas que se atualizam depois de cada operação.",
+  },
+  typescript: {
+    name: "TypeScript",
+    symbol: "Ts",
+    category: "frontend",
+    status: "pratica",
+    description:
+      "Linguagem do Sistema Pilates de ponta a ponta: API em Fastify, frontend em React e pacote de schemas compartilhado.",
   },
   java: {
     name: "Java",
@@ -126,7 +142,23 @@ export const technologies = {
     category: "backend",
     status: "pratica",
     description:
-      "Ferramental dos projetos (npm, Vite) e um servidor local sem dependências para executar o protótipo Vieira.",
+      "Executa a API do Sistema Pilates. Também está no ferramental dos projetos (npm, Vite) e no servidor local sem dependências do protótipo Vieira.",
+  },
+  fastify: {
+    name: "Fastify",
+    symbol: "Fy",
+    category: "backend",
+    status: "pratica",
+    description:
+      "API do Sistema Pilates organizada em módulos, com JWT e refresh token, perfis de acesso, Helmet e limite de requisições.",
+  },
+  zod: {
+    name: "Zod",
+    symbol: "Zd",
+    category: "backend",
+    status: "pratica",
+    description:
+      "Validação das entradas da API do Sistema Pilates com schemas reunidos no pacote compartilhado @pilates/shared, e dos formulários no frontend.",
   },
   sql: {
     name: "SQL",
@@ -140,7 +172,15 @@ export const technologies = {
     symbol: "My",
     category: "dados",
     status: "pratica",
-    description: "Banco de dados do IaWorkout (MySQL 8), executado em container com Docker Compose.",
+    description: "Banco de dados do IaWorkout e do Sistema Pilates (MySQL 8), executado em container com Docker Compose.",
+  },
+  prisma: {
+    name: "Prisma ORM",
+    symbol: "Pr",
+    category: "dados",
+    status: "pratica",
+    description:
+      "Modelagem e acesso a dados do Sistema Pilates: 32 modelos, migrations versionadas e transações nas operações financeiras.",
   },
   flyway: {
     name: "Flyway",
@@ -183,14 +223,30 @@ export const technologies = {
     symbol: "Dk",
     category: "ferramentas",
     status: "pratica",
-    description: "Dockerfiles e Docker Compose para subir MySQL, API e frontends do IaWorkout.",
+    description: "Dockerfiles e Docker Compose para subir banco MySQL, API e frontends do IaWorkout e do Sistema Pilates.",
   },
   nginx: {
     name: "Nginx",
     symbol: "Nx",
     category: "ferramentas",
     status: "pratica",
-    description: "Servidor web dos frontends do IaWorkout dentro dos containers.",
+    description:
+      "Servidor web dos frontends do IaWorkout e proxy reverso do Sistema Pilates, que encaminha /api/v1 para a API e o restante para o frontend.",
+  },
+  vitest: {
+    name: "Vitest",
+    symbol: "Vt",
+    category: "ferramentas",
+    status: "pratica",
+    description: "Testes automatizados do Sistema Pilates: 56 arquivos de teste na API e 29 no frontend.",
+  },
+  "github-actions": {
+    name: "GitHub Actions",
+    symbol: "Ga",
+    category: "ferramentas",
+    status: "pratica",
+    description:
+      "Integração contínua do Sistema Pilates: formatação, lint, checagem de tipos, migrations, testes com cobertura e build a cada push e pull request.",
   },
   vercel: {
     name: "Vercel",
@@ -215,13 +271,13 @@ export const technologies = {
     description:
       "Geração de fichas de treino em JSON a partir do perfil do aluno no IaWorkout, com novas tentativas em falhas do serviço e revisão obrigatória do instrutor.",
   },
-  typescript: {
-    name: "TypeScript",
-    symbol: "Ts",
-    category: "frontend",
-    status: "estudo",
+  "mercado-pago": {
+    name: "Mercado Pago (PIX)",
+    symbol: "Mp",
+    category: "integracoes",
+    status: "pratica",
     description:
-      "Listado entre as tecnologias em estudo no perfil do GitHub. Ainda não aparece nos projetos publicados.",
+      "Cobranças PIX com QR Code no Sistema Pilates, pelo SDK oficial: confirmação por webhook com assinatura verificada e expiração automática das cobranças.",
   },
 } satisfies Record<string, Technology>;
 

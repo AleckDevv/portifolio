@@ -64,7 +64,7 @@ export function seoForPath(pathname: string): Seo {
         name: project.name,
         description: project.tagline,
         url: absoluteUrl(`/projetos/${project.slug}/`),
-        codeRepository: project.links.repo,
+        ...(project.links.repo ? { codeRepository: project.links.repo } : {}),
         programmingLanguage: project.sheet.languages,
         dateCreated: project.createdAt,
         author: { ...person, url: absoluteUrl("/") },
