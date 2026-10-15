@@ -1,9 +1,9 @@
-import { useRef, useState, type CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
 import { getImage } from "../../content/images";
 import { profile } from "../../content/profile";
 import { projects } from "../../content/projects";
 import { asset } from "../../content/site";
-import { useIsoLayoutEffect, useMounted } from "../../lib/hooks";
+import { useBornAfterInitialRender, useIsoLayoutEffect } from "../../lib/hooks";
 import { INTRO_REVEAL } from "../../lib/intro";
 import { Picture } from "../media/Picture";
 
@@ -41,13 +41,13 @@ const DECK = [
 
 export function Intro() {
   const ref = useRef<HTMLDivElement>(null);
-  const mounted = useMounted();
-  // Montado depois da hidratação (navegação interna de volta ao início): não toca de novo.
-  const [bornAfterHydration] = useState(mounted);
+  // A abertura pertence à carga da página (hidratada ou, no `npm run dev`, do zero).
+  // Voltar ao início por navegação interna monta o componente de novo — aí não toca.
+  const bornLater = useBornAfterInitialRender();
 
   useIsoLayoutEffect(() => {
     const root = document.documentElement;
-    if (bornAfterHydration) {
+    if (bornLater) {
       if (root.dataset.intro === "play") root.dataset.intro = "done";
       return;
     }
@@ -99,7 +99,7 @@ export function Intro() {
     };
   }, []);
 
-  if (bornAfterHydration) return null;
+  if (bornLater) return null;
 
   // Do mais antigo ao mais recente: o projeto 01 fecha o maço e é renderizado.
   const deck = [...projects].reverse();

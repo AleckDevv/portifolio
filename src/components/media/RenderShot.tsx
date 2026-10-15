@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { getImage, type ImageId } from "../../content/images";
 import { asset } from "../../content/site";
-import { useIsoLayoutEffect, useMounted } from "../../lib/hooks";
+import { useBornAfterInitialRender, useIsoLayoutEffect } from "../../lib/hooks";
 import { useCursorEffects, usePrefs } from "../../lib/prefs-store";
 import { Picture } from "./Picture";
 
@@ -66,9 +66,8 @@ export function RenderShot({
   const frame = useRef<number | null>(null);
   const { reduceMotion, lite } = usePrefs();
   const cursorEffects = useCursorEffects();
-  const mounted = useMounted();
-  // true quando o componente nasce depois da hidratação (ex.: aba aberta pela primeira vez).
-  const [bornAfterHydration] = useState(mounted);
+  // true quando o componente nasce depois da carga da página (ex.: aba aberta pela primeira vez).
+  const bornLater = useBornAfterInitialRender();
   const [phase, setPhase] = useState<Phase>("static");
   // A planta só é baixada quando a tela se aproxima (ou com o mouse sobre ela).
   const [near, setNear] = useState(false);
@@ -131,23 +130,23 @@ export function RenderShot({
     return () => cancelAnimationFrame(raf);
   }, [motion]);
 
-  // Nova renderização curta quando `replay` passa a verdadeiro.
-  const firstReplay = useRef(true);
-  useEffect(() => {
-    const first = firstReplay.current;
-    firstReplay.current = false;
-    if (!replay || !motion || (first && !bornAfterHydration)) return;
-    let timer: number | undefined;
-    const raf = requestAnimationFrame(() => {
+  // Nova renderização curta quando `replay` passa a verdadeiro — ou quando a tela
+  // nasce já ativa depois da carga da página (aba aberta pela primeira vez).
+  // O valor anterior fica em estado (e não num efeito), então o StrictMode do
+  // desenvolvimento, que executa os efeitos duas vezes, não dispara por engano.
+  const [lastReplay, setLastReplay] = useState(bornLater ? false : replay);
+  if (replay !== lastReplay) {
+    setLastReplay(replay);
+    if (replay && motion) {
       setNear(true);
       setPhase("replay");
-      timer = window.setTimeout(() => setPhase("done"), DURATION.replay);
-    });
-    return () => {
-      cancelAnimationFrame(raf);
-      window.clearTimeout(timer);
-    };
-  }, [replay]); // eslint-disable-line react-hooks/exhaustive-deps
+    }
+  }
+  useEffect(() => {
+    if (phase !== "replay") return;
+    const timer = window.setTimeout(() => setPhase("done"), DURATION.replay);
+    return () => window.clearTimeout(timer);
+  }, [phase]);
 
   const lensEnabled = xray && cursorEffects && edges !== null;
 
